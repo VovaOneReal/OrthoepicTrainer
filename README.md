@@ -1,5 +1,5 @@
 # Орфоэпический тренажёр
-#### v. 1. 0. |  Сделал Vladimir T. (VovaOne) © Зима 2021 г.
+#### v. 1. 0. |  Сделал Vladimir T. (VovaOne) © 2021
 
 [GIF-демонстрация](https://gfycat.com/jovialdefensivearmyworm)
 
