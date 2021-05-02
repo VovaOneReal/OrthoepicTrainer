@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>materials/icon.ico</file>
+    <file>materials/icons/about.png</file>
+    <file>materials/icons/night.png</file>
+    <file>materials/icons/settings.png</file>
+</qresource>
+</RCC>

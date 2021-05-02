@@ -129,9 +129,7 @@ dmypy.json
 .pyre/
 *.psd
 answers
-*.bat
 README!.txt
-icon.ico
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm
@@ -147,6 +145,8 @@ icon.ico
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+.idea/.gitignore
 
 # Generated files
 .idea/**/contentModel.xml
@@ -248,3 +248,5 @@ fabric.properties
 .idea/vcs.xml
 1.jpg
 .idea/workspace.xml~
+setup.py
+build.bat

@@ -1,0 +1,165 @@
+/*
+Палитра приложения:
+https://coolors.co/80bfff-85c2ff-99ccff-add6ff-f2f2f2-e0e0e0-ebebeb-ffffff-000000-808080
+*/
+
+/*-------------------Общие свойства-------------------*/
+QWidget {
+    background-color: #F2F2F2;
+    font-family: "Montserrat";
+}
+
+QLineEdit {
+    border-radius: 15px;
+    border: 1px solid #80BFFF;
+    background-color: #ffffff;
+}
+
+
+/*-------------------Главное окно-------------------*/
+QLabel#header {
+    background-color: #80BFFF;
+    /*border-bottom: 4px solid #66b3ff;*/
+    color: white;
+    font-weight: bold;
+}
+
+QPushButton#start-button {
+    border-radius: 15px;
+    background-color: #80BFFF;
+    font-weight: bold;
+}
+
+QPushButton#start-button:hover {
+    background-color: #99ccff;
+}
+
+QPushButton#start-button:pressed {
+    background-color: #add6ff;
+}
+
+QPushButton#context-button {
+    border-radius: 15px;
+    background-color: #85c2ff;
+    font-size: 10pt;
+}
+
+QPushButton#context-button:hover {
+    background-color: #99ccff;
+}
+
+QPushButton#context-button:pressed {
+    background-color: #add6ff;
+}
+
+/*-------------------Окно тренировки-------------------*/
+
+
+/*Базовые стили*/
+
+QProgressBar#training-prb {
+    background-color: #d6ebff;
+    border: none;
+}
+
+QProgressBar#training-prb::chunk {
+    background-color: #80BFFF;
+}
+
+QLabel#training-header {
+    background-color: #80BFFF;
+    color: white;
+    font-weight: bold;
+}
+
+QLabel#example {
+    font-size: 12pt;
+}
+
+QPushButton#next {
+    font-size: 10pt;
+    border-radius: 15px;
+    background-color: #e0e0e0;
+}
+
+QPushButton#next:hover {
+    background-color: #ebebeb;
+}
+
+QPushButton#next:pressed {
+    background-color: #f2f2f2;
+}
+
+/* Стили тренеровочных кнопок */
+
+QPushButton#training-button {
+    font-size: 21pt;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
+QPushButton#training-button:hover {
+    background-color: #e0e0e0;
+}
+
+QPushButton#training-button:pressed {
+    background-color: #ebebeb;
+}
+
+QPushButton#training-button:disabled {
+    color: #808080;
+    font-weight: normal;
+}
+
+/* Стиль кнопки для демонстрации верного ответа */
+QPushButton#training-button-corr {
+    font-size: 21pt;
+    border-radius: 25px;
+    font-weight: bold;
+    background-color: #d5f2cf;
+    color: #60cc47;
+}
+
+/* Стили верного ответа */
+
+QLabel#training-header-corr {
+    background-color: #60cc47;
+    color: white;
+}
+
+QProgressBar#training-prb-corr {
+    background-color: #d5f2cf;
+    border: none;
+}
+
+QProgressBar#training-prb-corr::chunk {
+    background-color: #60cc47;
+}
+
+
+/* Стили неверного ответа */
+
+QLabel#training-header-incorr {
+    background-color: #CC4747;
+    color: white;
+}
+
+QProgressBar#training-prb-incorr {
+    background-color: #edbfbf;
+    border: none;
+}
+
+QProgressBar#training-prb-incorr::chunk {
+    background-color: #CC4747;
+}
+
+/*-------------------Окно результатов-------------------*/
+
+QLabel#grade {
+    font-size: 12pt;
+}
+
+QLabel#comment{
+    font-size: 10pt;
+    font-style: italic;
+}
