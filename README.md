@@ -1,7 +1,7 @@
 # Орфоэпический тренажёр
 #### v. 2.0 (от 02.05.21)  |  Сделал Vladimir T. (VovaOne) © 2021
 
-![GIF-Demo](orphoepic-trainer-presentation.gif)
+![GIF-Demo](demonstration/orthoepic-trainer-2-0-0.gif)
 
 ## Новое в версии 2.0
 - Добавлен графический интерфейс.
