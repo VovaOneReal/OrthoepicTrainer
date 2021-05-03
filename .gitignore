@@ -250,3 +250,4 @@ fabric.properties
 .idea/workspace.xml~
 setup.py
 build.bat
+/words.txt.bak

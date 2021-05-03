@@ -4,5 +4,8 @@
     <file>materials/icons/about.png</file>
     <file>materials/icons/night.png</file>
     <file>materials/icons/settings.png</file>
+    <file>materials/icons/n_about.png</file>
+    <file>materials/icons/n_night.png</file>
+    <file>materials/icons/n_settings.png</file>
 </qresource>
 </RCC>

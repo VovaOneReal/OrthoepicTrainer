@@ -26,6 +26,8 @@ is_repeat = False  # Режим повтора
 
 # Значения настроек -----------------------------------------------------------
 
+is_dark_mode = False
+
 next_question_delay = 1000
 repeats_amount = 3
 default_amount = 10
@@ -55,19 +57,29 @@ class MainWindow(QMainWindow):
         # Количество строк (слов) в words.txt
         self.amount_of_lines = None
 
-        # Спрятал кнопку "тёмной темы" за ненадобностью
-        self.ui.b_night.hide()
-
-        # Устанавливаю иконки для кнопок в окне
-        # Кнопка ночного режима
-        i_night_mode = QIcon(QPixmap(":/materials/icons/night.png"))
-        self.ui.b_night.setIcon(i_night_mode)
-        # Кнопка окна авторов
-        i_about = QIcon(QPixmap(":/materials/icons/about.png"))
-        self.ui.b_about.setIcon(i_about)
-        # Кнопка настроек
-        i_settings = QIcon(QPixmap(":/materials/icons/settings.png"))
-        self.ui.b_settings.setIcon(i_settings)
+        global is_dark_mode
+        if is_dark_mode:
+            # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
+            # Кнопка ночного режима
+            i_night_mode = QIcon(QPixmap(":/materials/icons/n_night.png"))
+            self.ui.b_night.setIcon(i_night_mode)
+            # Кнопка окна авторов
+            i_about = QIcon(QPixmap(":/materials/icons/n_about.png"))
+            self.ui.b_about.setIcon(i_about)
+            # Кнопка настроек
+            i_settings = QIcon(QPixmap(":/materials/icons/n_settings.png"))
+            self.ui.b_settings.setIcon(i_settings)
+        else:
+            # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
+            # Кнопка ночного режима
+            i_night_mode = QIcon(QPixmap(":/materials/icons/night.png"))
+            self.ui.b_night.setIcon(i_night_mode)
+            # Кнопка окна авторов
+            i_about = QIcon(QPixmap(":/materials/icons/about.png"))
+            self.ui.b_about.setIcon(i_about)
+            # Кнопка настроек
+            i_settings = QIcon(QPixmap(":/materials/icons/settings.png"))
+            self.ui.b_settings.setIcon(i_settings)
 
         # Иконка приложения
         i_app = QIcon(QPixmap(":/materials/icon.ico"))
@@ -84,6 +96,49 @@ class MainWindow(QMainWindow):
         self.ui.b_about.clicked.connect(self.show_about)
         self.ui.b_settings.clicked.connect(self.show_settings)
         self.ui.b_start.clicked.connect(self.start)
+        self.ui.b_night.clicked.connect(self.night_mode)
+
+    @Slot()
+    def night_mode(self):
+        """Включение/выключение тёмной темы."""
+
+        global app, is_dark_mode
+
+        # Включение тёмной темы
+        if not is_dark_mode:
+            with open("style-dark.qss", "r") as f:
+                _style = f.read()
+                app.setStyleSheet(_style)
+                is_dark_mode = True
+
+            # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
+            # Кнопка ночного режима
+            i_night_mode = QIcon(QPixmap(":/materials/icons/n_night.png"))
+            self.ui.b_night.setIcon(i_night_mode)
+            # Кнопка окна авторов
+            i_about = QIcon(QPixmap(":/materials/icons/n_about.png"))
+            self.ui.b_about.setIcon(i_about)
+            # Кнопка настроек
+            i_settings = QIcon(QPixmap(":/materials/icons/n_settings.png"))
+            self.ui.b_settings.setIcon(i_settings)
+
+        # Выключение тёмной темы
+        elif is_dark_mode:
+            with open("style.qss", "r") as f:
+                _style = f.read()
+                app.setStyleSheet(_style)
+                is_dark_mode = False
+
+            # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
+            # Кнопка ночного режима
+            i_night_mode = QIcon(QPixmap(":/materials/icons/night.png"))
+            self.ui.b_night.setIcon(i_night_mode)
+            # Кнопка окна авторов
+            i_about = QIcon(QPixmap(":/materials/icons/about.png"))
+            self.ui.b_about.setIcon(i_about)
+            # Кнопка настроек
+            i_settings = QIcon(QPixmap(":/materials/icons/settings.png"))
+            self.ui.b_settings.setIcon(i_settings)
 
     @Slot()
     def show_about(self):
@@ -211,6 +266,10 @@ class About(QWidget):
         # Иконка приложения
         i_app = QIcon(QPixmap(":/materials/icon.ico"))
         self.setWindowIcon(i_app)
+
+        global is_dark_mode
+        if is_dark_mode:
+            self.ui.label_2.setText('<a href="https://github.com/VovaOneReal/OrthoepicTrainer"><span style=" text-decoration: underline; color:#3091f2;">Проект на GitHub</span></a>')
 
         # Позволяю открывать внешние ссылки
         self.ui.label_2.setOpenExternalLinks(True)
