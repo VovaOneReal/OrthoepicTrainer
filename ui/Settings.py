@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Settings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.0.3
+## Created by: Qt User Interface Compiler version 6.0.4
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -110,6 +110,18 @@ class Ui_Settings(object):
 
         self.gridLayout.addWidget(self.sb_2, 2, 1, 1, 1)
 
+        self.label = QLabel(self.gridLayoutWidget)
+        self.label.setObjectName(u"label")
+        self.label.setFont(font1)
+        self.label.setWordWrap(True)
+
+        self.gridLayout.addWidget(self.label, 4, 0, 1, 1)
+
+        self.checkBox = QCheckBox(self.gridLayoutWidget)
+        self.checkBox.setObjectName(u"checkBox")
+
+        self.gridLayout.addWidget(self.checkBox, 4, 1, 1, 1)
+
 
         self.retranslateUi(Settings)
 
@@ -126,5 +138,7 @@ class Ui_Settings(object):
         self.l_5.setText(QCoreApplication.translate("Settings", u"\u0447\u0435\u0440\u0435\u0437", None))
         self.l_2.setText(QCoreApplication.translate("Settings", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u0432\u0442\u043e\u0440\u0435\u043d\u0438\u0439 \u0434\u043b\u044f \u0441\u043b\u043e\u0432\u0430:", None))
         self.l_1.setText(QCoreApplication.translate("Settings", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043b\u043e\u0432 \u043f\u043e-\u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e:", None))
+        self.label.setText(QCoreApplication.translate("Settings", u"\u0421\u0431\u0440\u043e\u0441 \u043f\u0440\u043e\u0433\u0440\u0435\u0441\u0441\u0430 \u043f\u043e\u0432\u0442\u043e\u0440\u0435\u043d\u0438\u044f \u0434\u043b\u044f \u0441\u043b\u043e\u0432\u0430, \u0435\u0441\u043b\u0438 \u0431\u044b\u043b\u0430 \u0434\u043e\u043f\u0443\u0449\u0435\u043d\u0430 \u043e\u0448\u0438\u0431\u043a\u0430:", None))
+        self.checkBox.setText("")
     # retranslateUi
 

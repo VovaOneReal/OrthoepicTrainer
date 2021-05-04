@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'Training.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.0.3
+## Created by: Qt User Interface Compiler version 6.0.4
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -50,6 +50,29 @@ class Ui_Training(object):
         self.pb_next = QPushButton(Training)
         self.pb_next.setObjectName(u"pb_next")
         self.pb_next.setGeometry(QRect(180, 380, 431, 41))
+        self.pb_back = QPushButton(Training)
+        self.pb_back.setObjectName(u"pb_back")
+        self.pb_back.setGeometry(QRect(10, 10, 31, 31))
+        palette = QPalette()
+        brush = QBrush(QColor(0, 0, 0, 255))
+        brush.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.WindowText, brush)
+        brush1 = QBrush(QColor(51, 153, 255, 255))
+        brush1.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.Highlight, brush1)
+        palette.setBrush(QPalette.Inactive, QPalette.WindowText, brush)
+        brush2 = QBrush(QColor(240, 240, 240, 255))
+        brush2.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Highlight, brush2)
+        brush3 = QBrush(QColor(120, 120, 120, 255))
+        brush3.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Disabled, QPalette.WindowText, brush3)
+        palette.setBrush(QPalette.Disabled, QPalette.Highlight, brush1)
+        self.pb_back.setPalette(palette)
+        icon = QIcon()
+        icon.addFile(u"../materials/icons/back.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.pb_back.setIcon(icon)
+        self.pb_back.setIconSize(QSize(16, 16))
 
         self.retranslateUi(Training)
 
@@ -62,5 +85,6 @@ class Ui_Training(object):
         self.l_header.setText(QCoreApplication.translate("Training", u"\u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0430", None))
         self.l_example.setText(QCoreApplication.translate("Training", u"TextLabel", None))
         self.pb_next.setText(QCoreApplication.translate("Training", u"\u0414\u0430\u043b\u0435\u0435", None))
+        self.pb_back.setText("")
     # retranslateUi
 

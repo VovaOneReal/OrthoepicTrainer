@@ -61,7 +61,7 @@
      <string>Введите кол-во тренируемых слов...</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="b_start">
+   <widget class="QPushButton" name="pb_start">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -128,7 +128,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="b_settings">
+   <widget class="QPushButton" name="pb_settings">
     <property name="geometry">
      <rect>
       <x>700</x>
@@ -151,7 +151,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="b_about">
+   <widget class="QPushButton" name="pb_about">
     <property name="geometry">
      <rect>
       <x>740</x>
@@ -168,7 +168,7 @@
       <normaloff>../materials/icons/about.png</normaloff>../materials/icons/about.png</iconset>
     </property>
    </widget>
-   <widget class="QPushButton" name="b_night">
+   <widget class="QPushButton" name="pb_night">
     <property name="geometry">
      <rect>
       <x>20</x>

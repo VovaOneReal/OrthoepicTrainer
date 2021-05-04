@@ -12,7 +12,7 @@ from ui.Results import Ui_Results
 from ui.Settings import Ui_Settings
 from ui.Training import Ui_Training
 
-import resources
+import materials.resources
 
 # Служебные переменные --------------------------------------------------------
 
@@ -61,42 +61,42 @@ class MainWindow(QMainWindow):
         if is_dark_mode:
             # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
             # Кнопка ночного режима
-            i_night_mode = QIcon(QPixmap(":/materials/icons/n_night.png"))
-            self.ui.b_night.setIcon(i_night_mode)
+            i_night_mode = QIcon(QPixmap(":/icons/n_night.png"))
+            self.ui.pb_night.setIcon(i_night_mode)
             # Кнопка окна авторов
-            i_about = QIcon(QPixmap(":/materials/icons/n_about.png"))
-            self.ui.b_about.setIcon(i_about)
+            i_about = QIcon(QPixmap(":/icons/n_about.png"))
+            self.ui.pb_about.setIcon(i_about)
             # Кнопка настроек
-            i_settings = QIcon(QPixmap(":/materials/icons/n_settings.png"))
-            self.ui.b_settings.setIcon(i_settings)
+            i_settings = QIcon(QPixmap(":/icons/n_settings.png"))
+            self.ui.pb_settings.setIcon(i_settings)
         else:
             # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
             # Кнопка ночного режима
-            i_night_mode = QIcon(QPixmap(":/materials/icons/night.png"))
-            self.ui.b_night.setIcon(i_night_mode)
+            i_night_mode = QIcon(QPixmap(":/icons/night.png"))
+            self.ui.pb_night.setIcon(i_night_mode)
             # Кнопка окна авторов
-            i_about = QIcon(QPixmap(":/materials/icons/about.png"))
-            self.ui.b_about.setIcon(i_about)
+            i_about = QIcon(QPixmap(":/icons/about.png"))
+            self.ui.pb_about.setIcon(i_about)
             # Кнопка настроек
-            i_settings = QIcon(QPixmap(":/materials/icons/settings.png"))
-            self.ui.b_settings.setIcon(i_settings)
+            i_settings = QIcon(QPixmap(":/icons/settings.png"))
+            self.ui.pb_settings.setIcon(i_settings)
 
         # Иконка приложения
-        i_app = QIcon(QPixmap(":/materials/icon.ico"))
+        i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
         # Даю элементам интерфейса имена для стилей
         self.ui.l_header.setObjectName("header")
-        self.ui.b_start.setObjectName("start-button")
-        self.ui.b_about.setObjectName("context-button")
-        self.ui.b_settings.setObjectName("context-button")
-        self.ui.b_night.setObjectName("context-button")
+        self.ui.pb_start.setObjectName("start-button")
+        self.ui.pb_about.setObjectName("context-button")
+        self.ui.pb_settings.setObjectName("context-button")
+        self.ui.pb_night.setObjectName("context-button")
 
         # Выдаю функционал кнопкам в главном окне
-        self.ui.b_about.clicked.connect(self.show_about)
-        self.ui.b_settings.clicked.connect(self.show_settings)
-        self.ui.b_start.clicked.connect(self.start)
-        self.ui.b_night.clicked.connect(self.night_mode)
+        self.ui.pb_about.clicked.connect(self.show_about)
+        self.ui.pb_settings.clicked.connect(self.show_settings)
+        self.ui.pb_start.clicked.connect(self.start)
+        self.ui.pb_night.clicked.connect(self.night_mode)
 
     @Slot()
     def night_mode(self):
@@ -113,14 +113,14 @@ class MainWindow(QMainWindow):
 
             # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
             # Кнопка ночного режима
-            i_night_mode = QIcon(QPixmap(":/materials/icons/n_night.png"))
-            self.ui.b_night.setIcon(i_night_mode)
+            i_night_mode = QIcon(QPixmap(":/icons/n_night.png"))
+            self.ui.pb_night.setIcon(i_night_mode)
             # Кнопка окна авторов
-            i_about = QIcon(QPixmap(":/materials/icons/n_about.png"))
-            self.ui.b_about.setIcon(i_about)
+            i_about = QIcon(QPixmap(":/icons/n_about.png"))
+            self.ui.pb_about.setIcon(i_about)
             # Кнопка настроек
-            i_settings = QIcon(QPixmap(":/materials/icons/n_settings.png"))
-            self.ui.b_settings.setIcon(i_settings)
+            i_settings = QIcon(QPixmap(":/icons/n_settings.png"))
+            self.ui.pb_settings.setIcon(i_settings)
 
         # Выключение тёмной темы
         elif is_dark_mode:
@@ -131,14 +131,14 @@ class MainWindow(QMainWindow):
 
             # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
             # Кнопка ночного режима
-            i_night_mode = QIcon(QPixmap(":/materials/icons/night.png"))
-            self.ui.b_night.setIcon(i_night_mode)
+            i_night_mode = QIcon(QPixmap(":/icons/night.png"))
+            self.ui.pb_night.setIcon(i_night_mode)
             # Кнопка окна авторов
-            i_about = QIcon(QPixmap(":/materials/icons/about.png"))
-            self.ui.b_about.setIcon(i_about)
+            i_about = QIcon(QPixmap(":/icons/about.png"))
+            self.ui.pb_about.setIcon(i_about)
             # Кнопка настроек
-            i_settings = QIcon(QPixmap(":/materials/icons/settings.png"))
-            self.ui.b_settings.setIcon(i_settings)
+            i_settings = QIcon(QPixmap(":/icons/settings.png"))
+            self.ui.pb_settings.setIcon(i_settings)
 
     @Slot()
     def show_about(self):
@@ -264,7 +264,7 @@ class About(QWidget):
         self.setAttribute(Qt.WA_QuitOnClose, False)  # Закрываем окно, если оно последнее
 
         # Иконка приложения
-        i_app = QIcon(QPixmap(":/materials/icon.ico"))
+        i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
         global is_dark_mode
@@ -290,7 +290,7 @@ class Settings(QWidget):
         self.ui.pb_cancel.setObjectName("context-button")
 
         # Иконка приложения
-        i_app = QIcon(QPixmap(":/materials/icon.ico"))
+        i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
         # Даю функционал кнопкам
@@ -364,8 +364,11 @@ class Training(QWidget):
         self.results = None
 
         # Иконка приложения
-        i_app = QIcon(QPixmap(":/materials/icon.ico"))
+        i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
+
+        i_back = QIcon(QPixmap(":/icons/back.png"))
+        self.ui.pb_back.setIcon(i_back)
 
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
@@ -373,6 +376,7 @@ class Training(QWidget):
         self.ui.pb_next.setObjectName("context-button")
         self.ui.l_example.setObjectName("example")
         self.ui.pb_next.setObjectName("next")
+        self.ui.pb_back.setObjectName("training-context-button")
 
         # Функционал кнопки "далее"
         self.ui.pb_next.clicked.connect(self.next_question)
@@ -819,7 +823,7 @@ class Results(QWidget):
         self.ui.setupUi(self)
 
         # Иконка приложения
-        i_app = QIcon(QPixmap(":/materials/icon.ico"))
+        i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
         # Для установки стилей
