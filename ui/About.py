@@ -55,6 +55,6 @@ class Ui_About(object):
         About.setWindowTitle(QCoreApplication.translate("About", u"\u041e\u0431 \u0430\u0432\u0442\u043e\u0440\u0435", None))
         self.label.setText(QCoreApplication.translate("About", u"<html><head/><body><p align=\"center\">\u0420\u0430\u0437\u0440\u0430\u0431\u043e\u0442\u0447\u0438\u043a<br/>Vladimir T. (VovaOne)</p></body></html>", None))
         self.label_2.setText(QCoreApplication.translate("About", u"<html><head/><body><p><a href=\"https://github.com/VovaOneReal/OrthoepicTrainer\"><span style=\" text-decoration: underline; color:#0000ff;\">\u041f\u0440\u043e\u0435\u043a\u0442 \u043d\u0430 GitHub</span></a></p></body></html>", None))
-        self.label_3.setText(QCoreApplication.translate("About", u"v.2.0 (\u043e\u0442 02.05.21) \u00a9 2021 \u0433.", None))
+        self.label_3.setText(QCoreApplication.translate("About", u"v.2.1 (\u043e\u0442 05.05.21) \u00a9 2021 \u0433.", None))
     # retranslateUi
 

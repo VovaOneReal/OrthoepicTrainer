@@ -251,3 +251,4 @@ fabric.properties
 setup.py
 build.bat
 /words.txt.bak
+settings.ini

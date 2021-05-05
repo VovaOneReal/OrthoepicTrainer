@@ -50,17 +50,12 @@ class Ui_Settings(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.cb_1 = QCheckBox(self.gridLayoutWidget)
-        self.cb_1.setObjectName(u"cb_1")
-        self.cb_1.setChecked(True)
+        self.l_7 = QLabel(self.gridLayoutWidget)
+        self.l_7.setObjectName(u"l_7")
+        self.l_7.setFont(font1)
+        self.l_7.setWordWrap(True)
 
-        self.gridLayout.addWidget(self.cb_1, 3, 1, 1, 1)
-
-        self.l_6 = QLabel(self.gridLayoutWidget)
-        self.l_6.setObjectName(u"l_6")
-        self.l_6.setFont(font1)
-
-        self.gridLayout.addWidget(self.l_6, 5, 3, 1, 1)
+        self.gridLayout.addWidget(self.l_7, 4, 0, 1, 1)
 
         self.sb_3 = QSpinBox(self.gridLayoutWidget)
         self.sb_3.setObjectName(u"sb_3")
@@ -68,13 +63,6 @@ class Ui_Settings(object):
         self.sb_3.setValue(2000)
 
         self.gridLayout.addWidget(self.sb_3, 5, 1, 1, 1)
-
-        self.l_4 = QLabel(self.gridLayoutWidget)
-        self.l_4.setObjectName(u"l_4")
-        self.l_4.setFont(font1)
-        self.l_4.setWordWrap(True)
-
-        self.gridLayout.addWidget(self.l_4, 3, 0, 1, 1)
 
         self.sb_1 = QSpinBox(self.gridLayoutWidget)
         self.sb_1.setObjectName(u"sb_1")
@@ -97,12 +85,6 @@ class Ui_Settings(object):
 
         self.gridLayout.addWidget(self.l_2, 2, 0, 1, 1)
 
-        self.l_1 = QLabel(self.gridLayoutWidget)
-        self.l_1.setObjectName(u"l_1")
-        self.l_1.setFont(font1)
-
-        self.gridLayout.addWidget(self.l_1, 1, 0, 1, 1)
-
         self.sb_2 = QSpinBox(self.gridLayoutWidget)
         self.sb_2.setObjectName(u"sb_2")
         self.sb_2.setMaximum(999)
@@ -110,17 +92,35 @@ class Ui_Settings(object):
 
         self.gridLayout.addWidget(self.sb_2, 2, 1, 1, 1)
 
-        self.label = QLabel(self.gridLayoutWidget)
-        self.label.setObjectName(u"label")
-        self.label.setFont(font1)
-        self.label.setWordWrap(True)
+        self.cb_1 = QCheckBox(self.gridLayoutWidget)
+        self.cb_1.setObjectName(u"cb_1")
+        self.cb_1.setChecked(True)
 
-        self.gridLayout.addWidget(self.label, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.cb_1, 3, 1, 1, 1)
 
-        self.checkBox = QCheckBox(self.gridLayoutWidget)
-        self.checkBox.setObjectName(u"checkBox")
+        self.l_4 = QLabel(self.gridLayoutWidget)
+        self.l_4.setObjectName(u"l_4")
+        self.l_4.setFont(font1)
+        self.l_4.setWordWrap(True)
 
-        self.gridLayout.addWidget(self.checkBox, 4, 1, 1, 1)
+        self.gridLayout.addWidget(self.l_4, 3, 0, 1, 1)
+
+        self.l_1 = QLabel(self.gridLayoutWidget)
+        self.l_1.setObjectName(u"l_1")
+        self.l_1.setFont(font1)
+
+        self.gridLayout.addWidget(self.l_1, 1, 0, 1, 1)
+
+        self.cb_2 = QCheckBox(self.gridLayoutWidget)
+        self.cb_2.setObjectName(u"cb_2")
+
+        self.gridLayout.addWidget(self.cb_2, 4, 1, 1, 1)
+
+        self.l_6 = QLabel(self.gridLayoutWidget)
+        self.l_6.setObjectName(u"l_6")
+        self.l_6.setFont(font1)
+
+        self.gridLayout.addWidget(self.l_6, 5, 2, 1, 1)
 
 
         self.retranslateUi(Settings)
@@ -132,13 +132,13 @@ class Ui_Settings(object):
         Settings.setWindowTitle(QCoreApplication.translate("Settings", u"\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438", None))
         self.pb_save.setText(QCoreApplication.translate("Settings", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c", None))
         self.pb_cancel.setText(QCoreApplication.translate("Settings", u"\u041e\u0442\u043c\u0435\u043d\u0430", None))
-        self.cb_1.setText("")
-        self.l_6.setText(QCoreApplication.translate("Settings", u"\u043c\u0441\u0435\u043a", None))
-        self.l_4.setText(QCoreApplication.translate("Settings", u"\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u043f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u0441\u043b\u043e\u0432\u0443:", None))
+        self.l_7.setText(QCoreApplication.translate("Settings", u"\u0421\u0431\u0440\u043e\u0441 \u043f\u0440\u043e\u0433\u0440\u0435\u0441\u0441\u0430 \u043f\u043e\u0432\u0442\u043e\u0440\u0435\u043d\u0438\u044f \u0434\u043b\u044f \u0441\u043b\u043e\u0432\u0430, \u0435\u0441\u043b\u0438 \u0431\u044b\u043b\u0430 \u0434\u043e\u043f\u0443\u0449\u0435\u043d\u0430 \u043e\u0448\u0438\u0431\u043a\u0430:", None))
         self.l_5.setText(QCoreApplication.translate("Settings", u"\u0447\u0435\u0440\u0435\u0437", None))
         self.l_2.setText(QCoreApplication.translate("Settings", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u0432\u0442\u043e\u0440\u0435\u043d\u0438\u0439 \u0434\u043b\u044f \u0441\u043b\u043e\u0432\u0430:", None))
+        self.cb_1.setText("")
+        self.l_4.setText(QCoreApplication.translate("Settings", u"\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u043f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u0441\u043b\u043e\u0432\u0443:", None))
         self.l_1.setText(QCoreApplication.translate("Settings", u"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043b\u043e\u0432 \u043f\u043e-\u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e:", None))
-        self.label.setText(QCoreApplication.translate("Settings", u"\u0421\u0431\u0440\u043e\u0441 \u043f\u0440\u043e\u0433\u0440\u0435\u0441\u0441\u0430 \u043f\u043e\u0432\u0442\u043e\u0440\u0435\u043d\u0438\u044f \u0434\u043b\u044f \u0441\u043b\u043e\u0432\u0430, \u0435\u0441\u043b\u0438 \u0431\u044b\u043b\u0430 \u0434\u043e\u043f\u0443\u0449\u0435\u043d\u0430 \u043e\u0448\u0438\u0431\u043a\u0430:", None))
-        self.checkBox.setText("")
+        self.cb_2.setText("")
+        self.l_6.setText(QCoreApplication.translate("Settings", u"\u043c\u0441\u0435\u043a", None))
     # retranslateUi
 

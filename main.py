@@ -289,6 +289,10 @@ class Settings(QWidget):
         self.ui.pb_save.setObjectName("context-button")
         self.ui.pb_cancel.setObjectName("context-button")
 
+        # КНОПКИ НОВЫХ ОПЦИЙ СКРЫТЫ
+        self.ui.cb_2.hide()
+        self.ui.l_7.hide()
+
         # Иконка приложения
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
@@ -367,8 +371,17 @@ class Training(QWidget):
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
-        i_back = QIcon(QPixmap(":/icons/back.png"))
-        self.ui.pb_back.setIcon(i_back)
+        # КНОПКА "НАЗАД В МЕНЮ" СКРЫТА
+        self.ui.pb_back.hide()
+
+        # Иконка кнопки "Назад в меню"
+        global is_dark_mode
+        if is_dark_mode:
+            i_back = QIcon(QPixmap(":/icons/n_back.png"))
+            self.ui.pb_back.setIcon(i_back)
+        else:
+            i_back = QIcon(QPixmap(":/icons/back.png"))
+            self.ui.pb_back.setIcon(i_back)
 
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
@@ -534,11 +547,9 @@ class Training(QWidget):
             # ...и проверяем, чтобы мы не вышли за границы дозволенного
             if self.current_repeat_w >= len(bad_words):
                 self.current_repeat_w = 0
-            # Аналогично здесь, но только если мы наткнулись на уже повторённое слово
+            # Если мы наткнулись на повторённое слово, то ищем следующее не повторённое
             if self.word_progress[self.current_repeat_w] == 0:
-                self.current_repeat_w += 1
-                if self.current_repeat_w >= len(bad_words):
-                    self.current_repeat_w = 0
+                continue
             else:
                 break
 

@@ -93,6 +93,27 @@ QPushButton#next:pressed {
     background-color: #858585;
 }
 
+/* Стили контекстных кнопок */
+QPushButton#training-context-button {
+    background-color: #2b2b2b;
+    border-radius: 15px;
+    font-size: 21pt;
+    font-weight: bold;
+}
+
+QPushButton#training-context-button:hover {
+    background-color: #4D4D4D;
+}
+
+QPushButton#training-context-button:pressed {
+    background-color: #666666;
+}
+
+QPushButton#training-context-button:disabled {
+    color: #808080;
+    font-weight: normal;
+}
+
 /* Стили тренеровочных кнопок */
 
 QPushButton#training-button {

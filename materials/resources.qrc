@@ -8,5 +8,6 @@
     <file>icons/n_about.png</file>
     <file>icons/n_night.png</file>
     <file>icons/n_settings.png</file>
+    <file>icons/n_back.png</file>
 </qresource>
 </RCC>
