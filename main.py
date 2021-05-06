@@ -14,6 +14,10 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
+# TODO: Защита от внезапного удаления файла answers
+# TODO: Возможно, переделать все операции с файлами под with
+# TODO: Сделать отдельную функцию проверки существования файла words.txt
+
 # Служебные переменные --------------------------------------------------------
 
 lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
@@ -38,6 +42,7 @@ is_auto_next = True
 main_window = None
 training_window = None
 
+
 # -----------------------------------------------------------------------------
 
 
@@ -50,7 +55,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Создаю экземпляры различных окон
+        # Создаю экземпляры дочерних окон
         self.about = None
         self.settings = None
 
@@ -168,7 +173,8 @@ class MainWindow(QMainWindow):
         except ValueError:
             entered_amount = default_amount
 
-        self.find_answers()  # Составляем ответы к словам / не перемещать строку дальше след. блока
+        self.amount_of_lines = self.get_amount_of_lines()  # Определяем количество строк (слов)
+        find_answers(self)  # Составляем ответы к словам / не перемещать строку дальше след. блока
 
         # Берём введённое кол-во слов
         if entered_amount <= 0 or entered_amount > self.amount_of_lines:
@@ -182,19 +188,19 @@ class MainWindow(QMainWindow):
         training_window = Training()
         training_window.show()
         self.close()
-        self.clear()
 
-    def find_answers(self):
+    def get_amount_of_lines(self):
         """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
-        Просматривает файл words.txt и на основе заглавных букв в словах составляет
-        файл с ответами - answers."""
+Просматривает файл words.txt и определяет количество строк (слов) в файле."""
 
         # Если не был обнаружен words.txt, то создаём его и заполняем несколькими словами
         # и сообщаем о ненахождении
         if not os.path.isfile("words.txt"):
-            QMessageBox.question(self, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым файлом. \
-Он будет создан и заполнен несколькими словами. Пожалуйста, поместите исходный файл \
-\"words.txt\" или настройте его самостоятельно в соответствии с инструкцией в \"README.txt\".",
+            QMessageBox.question(self, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
+                                                                      файлом. Он будет создан и заполнен несколькими словами. \
+                                                                      Пожалуйста, поместите исходный файл \"words.txt\" или \
+                                                                      настройте его самостоятельно в соответствии с инструкцией в \
+                                                                      \"README.txt\".",
                                  QMessageBox.Ok)
             filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
             file = open("words.txt", "w")
@@ -202,54 +208,12 @@ class MainWindow(QMainWindow):
             file.close()
 
         # Открываем соответствующие файлы
-        file = open("words.txt")
-        t = open("answers", "w")
+        with open("words.txt") as file:
+            # file = open("words.txt")
+            the_value = len(file.readlines())
+        # file.close()
 
-        self.amount_of_lines = len(file.readlines())
-        file.close()
-
-        file = open("words.txt")
-
-        while True:
-            # Читаем строку в файле
-            a_line = file.readline()
-            # Отрезаем окончание
-            a_line = a_line.rstrip("\n")
-
-            # Прерываем цикл, если встречается пустая строка - это значит весь файл уже прочитан
-            if not a_line:
-                break
-
-            # Иначе исследуем каждый символ в прочитанной строке, ведь строка - это одно слово.
-            amount_of_vowels = 0
-            # Переменная отвечает за то, была ли уже найдена заглавная буква или ещё нет
-            found_percussive_vowel = False
-
-            for x in a_line:
-                # Если это строчная гласная, то просто увеличиваем количество гласных для этого слова.
-                if x in lower_vowels:
-                    amount_of_vowels += 1
-
-                # Если заглавная (ударная) гласная, то не только увеличиваем их количество, но
-                # и записываем эту гласную как ответ к слову в файл answers,
-                # а если есть и другие ударные гласные, то через "/" записываем и их
-                elif x in upper_vowels:
-                    amount_of_vowels += 1
-                    if not found_percussive_vowel:
-                        found_percussive_vowel = True
-                        t.write(str(amount_of_vowels))
-                    elif found_percussive_vowel:
-                        t.write("/")
-                        t.write(str(amount_of_vowels))
-
-            t.write("\n")  # Перевод строки после записи ответа для слова
-
-        file.close()
-        t.close()
-
-    def clear(self):
-        """Очищает поле с количеством тренируемых слов."""
-        self.ui.le_word_amount.setText("")
+        return the_value
 
 
 class About(QWidget):
@@ -269,10 +233,11 @@ class About(QWidget):
 
         global is_dark_mode
         if is_dark_mode:
-            self.ui.label_2.setText('<a href="https://github.com/VovaOneReal/OrthoepicTrainer"><span style=" text-decoration: underline; color:#3091f2;">Проект на GitHub</span></a>')
+            self.ui.l_link.setText(
+                '<a href="https://github.com/VovaOneReal/OrthoepicTrainer"><span style=" text-decoration: underline; color:#3091f2;">Проект на GitHub</span></a>')
 
         # Позволяю открывать внешние ссылки
-        self.ui.label_2.setOpenExternalLinks(True)
+        self.ui.l_link.setOpenExternalLinks(True)
 
 
 class Settings(QWidget):
@@ -288,10 +253,6 @@ class Settings(QWidget):
 
         self.ui.pb_save.setObjectName("context-button")
         self.ui.pb_cancel.setObjectName("context-button")
-
-        # КНОПКИ НОВЫХ ОПЦИЙ СКРЫТЫ
-        self.ui.cb_2.hide()
-        self.ui.l_7.hide()
 
         # Иконка приложения
         i_app = QIcon(QPixmap(":/icon.ico"))
@@ -371,9 +332,6 @@ class Training(QWidget):
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
-        # КНОПКА "НАЗАД В МЕНЮ" СКРЫТА
-        self.ui.pb_back.hide()
-
         # Иконка кнопки "Назад в меню"
         global is_dark_mode
         if is_dark_mode:
@@ -391,8 +349,9 @@ class Training(QWidget):
         self.ui.pb_next.setObjectName("next")
         self.ui.pb_back.setObjectName("training-context-button")
 
-        # Функционал кнопки "далее"
+        # Функционал кнопок
         self.ui.pb_next.clicked.connect(self.next_question)
+        self.ui.pb_back.clicked.connect(self.return_to_menu)
 
         self.a_word = ""  # Для текущего слова
         self.answer = 0  # Номер гласной-ответа
@@ -561,15 +520,6 @@ class Training(QWidget):
         self.ui.pb_next.setText("Вернуться в меню")
         self.ui.pb_next.show()
 
-    @Slot()
-    def return_to_menu(self):
-        """Возвращение в главное меню"""
-        global main_window
-        clear_globals()
-        main_window = MainWindow()
-        main_window.show()
-        self.close()
-
     def change_progress(self):
         """Меняет значение в Progress Bar."""
         global is_repeat
@@ -627,6 +577,15 @@ class Training(QWidget):
                 button.clicked.disconnect(self.incorrect)
 
             x += 1
+
+    @Slot()
+    def return_to_menu(self):
+        """Возвращение в главное меню"""
+        global main_window
+        clear_globals()
+        main_window = MainWindow()
+        main_window.show()
+        self.close()
 
     @Slot()
     def next_question(self):
@@ -780,9 +739,12 @@ class Training(QWidget):
 
         return a_number
 
-    @staticmethod
-    def define_answer(number):
-        """Ищет в answer.txt ответ на вопрос и возвращает его."""
+    def define_answer(self, number):
+        """Ищет в answers ответ на вопрос и возвращает его."""
+
+        # Если был удалён файл answers
+        if not os.path.isfile("answers"):
+            find_answers(self)
 
         t = open("answers")
         the_answer = None
@@ -951,6 +913,66 @@ class LetterButton(QPushButton):
         self.setMaximumSize(50, 50)
 
         self.isAnswer = False
+
+
+def find_answers(calling_window):
+    """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
+Просматривает файл words.txt и на основе заглавных букв в словах составляет
+файл с ответами - answers."""
+
+    # Если не был обнаружен words.txt, то создаём его и заполняем несколькими словами
+    # и сообщаем о ненахождении
+    if not os.path.isfile("words.txt"):
+        QMessageBox.question(calling_window, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
+                                                          файлом. Он будет создан и заполнен несколькими словами. \
+                                                          Пожалуйста, поместите исходный файл \"words.txt\" или \
+                                                          настройте его самостоятельно в соответствии с инструкцией в \
+                                                          \"README.txt\".",
+                             QMessageBox.Ok)
+        filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
+        file = open("words.txt", "w")
+        file.write(filler)
+        file.close()
+
+    t = open("answers", "w")
+    file = open("words.txt")
+
+    while True:
+        # Читаем строку в файле
+        a_line = file.readline()
+        # Отрезаем окончание
+        a_line = a_line.rstrip("\n")
+
+        # Прерываем цикл, если встречается пустая строка - это значит весь файл уже прочитан
+        if not a_line:
+            break
+
+        # Иначе исследуем каждый символ в прочитанной строке, ведь строка - это одно слово.
+        amount_of_vowels = 0
+        # Переменная отвечает за то, была ли уже найдена заглавная буква или ещё нет
+        found_percussive_vowel = False
+
+        for x in a_line:
+            # Если это строчная гласная, то просто увеличиваем количество гласных для этого слова.
+            if x in lower_vowels:
+                amount_of_vowels += 1
+
+            # Если заглавная (ударная) гласная, то не только увеличиваем их количество, но
+            # и записываем эту гласную как ответ к слову в файл answers,
+            # а если есть и другие ударные гласные, то через "/" записываем и их
+            elif x in upper_vowels:
+                amount_of_vowels += 1
+                if not found_percussive_vowel:
+                    found_percussive_vowel = True
+                    t.write(str(amount_of_vowels))
+                elif found_percussive_vowel:
+                    t.write("/")
+                    t.write(str(amount_of_vowels))
+
+        t.write("\n")  # Перевод строки после записи ответа для слова
+
+    file.close()
+    t.close()
 
 
 def check_settings_existence():

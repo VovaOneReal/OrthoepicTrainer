@@ -130,6 +130,7 @@ dmypy.json
 *.psd
 answers
 README!.txt
+settings.ini
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm

@@ -73,6 +73,14 @@ class Ui_Training(object):
         icon.addFile(u"../materials/icons/back.png", QSize(), QIcon.Normal, QIcon.Off)
         self.pb_back.setIcon(icon)
         self.pb_back.setIconSize(QSize(16, 16))
+        self.l_stats = QLabel(Training)
+        self.l_stats.setObjectName(u"l_stats")
+        self.l_stats.setGeometry(QRect(180, 430, 431, 20))
+        font1 = QFont()
+        font1.setFamily(u"Roboto")
+        font1.setPointSize(10)
+        self.l_stats.setFont(font1)
+        self.l_stats.setAlignment(Qt.AlignCenter)
 
         self.retranslateUi(Training)
 
@@ -86,5 +94,6 @@ class Ui_Training(object):
         self.l_example.setText(QCoreApplication.translate("Training", u"TextLabel", None))
         self.pb_next.setText(QCoreApplication.translate("Training", u"\u0414\u0430\u043b\u0435\u0435", None))
         self.pb_back.setText("")
+        self.l_stats.setText(QCoreApplication.translate("Training", u"000 / 000 / 000", None))
     # retranslateUi
 

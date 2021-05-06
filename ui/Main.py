@@ -53,7 +53,7 @@ class Ui_MainWindow(object):
         self.l_header.setAlignment(Qt.AlignCenter)
         self.l_description = QLabel(self.centralwidget)
         self.l_description.setObjectName(u"l_description")
-        self.l_description.setGeometry(QRect(100, 100, 581, 241))
+        self.l_description.setGeometry(QRect(140, 90, 511, 221))
         self.l_description.setFont(font1)
         self.l_description.setTextFormat(Qt.RichText)
         self.l_description.setWordWrap(True)
@@ -77,6 +77,12 @@ class Ui_MainWindow(object):
         icon3.addFile(u"../materials/icons/night.png", QSize(), QIcon.Normal, QIcon.Off)
         self.pb_night.setIcon(icon3)
         self.pb_night.setIconSize(QSize(16, 16))
+        self.l_form_info = QLabel(self.centralwidget)
+        self.l_form_info.setObjectName(u"l_form_info")
+        self.l_form_info.setEnabled(True)
+        self.l_form_info.setGeometry(QRect(100, 320, 591, 31))
+        self.l_form_info.setFont(font)
+        self.l_form_info.setAlignment(Qt.AlignCenter)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -85,15 +91,16 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u041e\u0440\u0444\u043e\u044d\u043f\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0442\u0440\u0435\u043d\u0430\u0436\u0451\u0440 v.2.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u041e\u0440\u0444\u043e\u044d\u043f\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0442\u0440\u0435\u043d\u0430\u0436\u0451\u0440", None))
         self.le_word_amount.setText("")
         self.le_word_amount.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043a\u043e\u043b-\u0432\u043e \u0442\u0440\u0435\u043d\u0438\u0440\u0443\u0435\u043c\u044b\u0445 \u0441\u043b\u043e\u0432...", None))
         self.pb_start.setText(QCoreApplication.translate("MainWindow", u"\u041d\u0430\u0447\u0430\u0442\u044c", None))
         self.l_header.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0440\u0444\u043e\u044d\u043f\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0442\u0440\u0435\u043d\u0430\u0436\u0451\u0440", None))
-        self.l_description.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"justify\">\u0412\u0430\u043c \u043f\u043e \u043e\u0447\u0435\u0440\u0435\u0434\u0438 \u0431\u0443\u0434\u0443\u0442 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0441\u043b\u043e\u0432\u0430 \u0431\u0435\u0437 \u0443\u0434\u0430\u0440\u0435\u043d\u0438\u0439. \u0412\u0430\u0448\u0430 \u0437\u0430\u0434\u0430\u0447\u0430 - \u0432\u044b\u0431\u0440\u0430\u0442\u044c \u0442\u0443 \u0433\u043b\u0430\u0441\u043d\u0443\u044e, \u043d\u0430 \u043a\u043e\u0442\u043e\u0440\u0443\u044e \u043f\u0430\u0434\u0430\u0435\u0442 \u0443\u0434\u0430\u0440\u0435\u043d\u0438\u0435.</p><p align=\"justify\">\u0412 \u043f\u043e\u043b\u0435 \u043d\u0438\u0436\u0435 \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u0432\u0432\u0435\u0441\u0442\u0438 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043b\u043e\u0432, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0432\u044b \u0431\u0443\u0434\u0435\u0442\u0435 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c.</p><p a"
-                        "lign=\"justify\"><span style=\" font-style:italic;\">\u0412\u0432\u0435\u0434\u044f &quot;0&quot;, \u0432\u044b \u0431\u0443\u0434\u0435\u0442\u0435 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0435 \u0441\u043b\u043e\u0432\u0430.<br/>\u041e\u0441\u0442\u0430\u0432\u0438\u0432 \u0432\u0432\u043e\u0434 \u043f\u0443\u0441\u0442\u044b\u043c, \u0432\u044b \u0431\u0443\u0434\u0435\u0442\u0435 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043b\u043e\u0432 \u043f\u043e-\u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e.</span></p></body></html>", None))
+        self.l_description.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"justify\">\u0412\u0430\u043c \u043f\u043e \u043e\u0447\u0435\u0440\u0435\u0434\u0438 \u0431\u0443\u0434\u0443\u0442 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0441\u043b\u043e\u0432\u0430 \u0431\u0435\u0437 \u0443\u0434\u0430\u0440\u0435\u043d\u0438\u0439. \u0412\u0430\u0448\u0430 \u0437\u0430\u0434\u0430\u0447\u0430 - \u0432\u044b\u0431\u0440\u0430\u0442\u044c \u0442\u0443 \u0433\u043b\u0430\u0441\u043d\u0443\u044e, \u043d\u0430 \u043a\u043e\u0442\u043e\u0440\u0443\u044e \u043f\u0430\u0434\u0430\u0435\u0442 \u0443\u0434\u0430\u0440\u0435\u043d\u0438\u0435.</p><p align=\"justify\">\u0412 \u043f\u043e\u043b\u0435 \u043d\u0438\u0436\u0435 \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u0432\u0432\u0435\u0441\u0442\u0438 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043b\u043e\u0432, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0432\u044b \u0431\u0443\u0434\u0435\u0442\u0435 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c.</p></bo"
+                        "dy></html>", None))
         self.pb_settings.setText("")
         self.pb_about.setText("")
         self.pb_night.setText("")
+        self.l_form_info.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">\u0414\u043b\u044f \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0432\u0441\u0435\u0445 \u0441\u043b\u043e\u0432 \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043b\u044c. <br/>\u0414\u043b\u044f \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u0430 \u043f\u043e-\u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e \u043e\u0441\u0442\u0430\u0432\u044c\u0442\u0435 \u043f\u043e\u043b\u0435 \u043f\u0443\u0441\u0442\u044b\u043c.</span></p></body></html>", None))
     # retranslateUi
 
