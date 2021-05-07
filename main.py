@@ -14,10 +14,6 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
-# TODO: Защита от внезапного удаления файла answers
-# TODO: Возможно, переделать все операции с файлами под with
-# TODO: Сделать отдельную функцию проверки существования файла words.txt
-
 # Служебные переменные --------------------------------------------------------
 
 lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
@@ -193,25 +189,11 @@ class MainWindow(QMainWindow):
         """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
 Просматривает файл words.txt и определяет количество строк (слов) в файле."""
 
-        # Если не был обнаружен words.txt, то создаём его и заполняем несколькими словами
-        # и сообщаем о ненахождении
-        if not os.path.isfile("words.txt"):
-            QMessageBox.question(self, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
-                                                                      файлом. Он будет создан и заполнен несколькими словами. \
-                                                                      Пожалуйста, поместите исходный файл \"words.txt\" или \
-                                                                      настройте его самостоятельно в соответствии с инструкцией в \
-                                                                      \"README.txt\".",
-                                 QMessageBox.Ok)
-            filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
-            file = open("words.txt", "w")
-            file.write(filler)
-            file.close()
+        check_words_existence(self)
 
         # Открываем соответствующие файлы
         with open("words.txt") as file:
-            # file = open("words.txt")
             the_value = len(file.readlines())
-        # file.close()
 
         return the_value
 
@@ -269,44 +251,43 @@ class Settings(QWidget):
     @Slot()
     def save_settings(self):
         """Производит сохранение введённых значений в полях в файл настроек."""
-        file = open("settings.ini", "w")
-        file.write("default=" + str(self.ui.sb_1.value()) + "\n")
-        file.write("repeat_amount=" + str(self.ui.sb_2.value()) + "\n")
 
-        # Для интерпретации типа bool в удобный мне int
-        if self.ui.cb_1.isChecked():
-            auto_next_value = 1
-        else:
-            auto_next_value = 0
-        file.write("auto_next=" + str(auto_next_value) + "\n")
+        with open("settings.ini", "w") as file:
+            file.write("default=" + str(self.ui.sb_1.value()) + "\n")
+            file.write("repeat_amount=" + str(self.ui.sb_2.value()) + "\n")
 
-        file.write("auto_time=" + str(self.ui.sb_3.value()) + "\n")
-        file.close()
+            # Для интерпретации типа bool в удобный мне int
+            if self.ui.cb_1.isChecked():
+                auto_next_value = 1
+            else:
+                auto_next_value = 0
+            file.write("auto_next=" + str(auto_next_value) + "\n")
+
+            file.write("auto_time=" + str(self.ui.sb_3.value()) + "\n")
+
         self.close()
 
     def update_settings(self):
         """Просматривает "Settings.ini" и восстанавливает значения из него."""
 
         check_settings_existence()
-        s = open("settings.ini")
 
-        for param in s.readlines():
-            param = param.rstrip("\n")
-            if "default=" in param:
-                default_value = int(param.lstrip("default="))
-                self.ui.sb_1.setValue(default_value)
-            elif "repeat_amount=" in param:
-                repeat_amount_value = int(param.lstrip("repeat_amount="))
-                self.ui.sb_2.setValue(repeat_amount_value)
-            elif "auto_next=" in param:
-                auto_next_value = bool(int(param.lstrip("auto_next=")))
-                self.ui.cb_1.setChecked(auto_next_value)
-                self.check_cb_state()
-            elif "auto_time=" in param:
-                auto_time_value = int(param.lstrip("auto_time="))
-                self.ui.sb_3.setValue(auto_time_value)
-
-        s.close()
+        with open("settings.ini") as s:
+            for param in s.readlines():
+                param = param.rstrip("\n")
+                if "default=" in param:
+                    default_value = int(param.lstrip("default="))
+                    self.ui.sb_1.setValue(default_value)
+                elif "repeat_amount=" in param:
+                    repeat_amount_value = int(param.lstrip("repeat_amount="))
+                    self.ui.sb_2.setValue(repeat_amount_value)
+                elif "auto_next=" in param:
+                    auto_next_value = bool(int(param.lstrip("auto_next=")))
+                    self.ui.cb_1.setChecked(auto_next_value)
+                    self.check_cb_state()
+                elif "auto_time=" in param:
+                    auto_time_value = int(param.lstrip("auto_time="))
+                    self.ui.sb_3.setValue(auto_time_value)
 
     def check_cb_state(self):
         """Блокирует спин-бокс, если выключен параметр автоматического перехода."""
@@ -706,36 +687,35 @@ class Training(QWidget):
         else:
             self.ui.pb_next.show()
 
-    @staticmethod
-    def define_word(line):
+    def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""
 
-        file = open("words.txt")
+        check_words_existence(self)
 
-        the_word = None
-        x = 1
-        while x <= line:
-            the_word = file.readline()
-            x += 1
+        with open("words.txt") as file:
+            the_word = None
+            x = 1
+            while x <= line:
+                the_word = file.readline()
+                x += 1
 
-        file.close()
-        return the_word
+            return the_word
 
     def define_random_word(self):
         """Определяет и возвращает случайный номер слова для вопроса, если его ещё не было."""
 
-        file = open("words.txt", "r")
+        check_words_existence(self)
 
-        # Узнаём количество строк в words.txt
-        amount_of_lines = len(file.readlines())
-        while True:
-            # Генерируем число, которое равносильно номеру строки в файле words.txt
-            a_number = random.randint(1, amount_of_lines)
-            if a_number not in self.completed_words:
-                self.completed_words.append(a_number)
-                break
+        with open("words.txt", "r") as file:
 
-        file.close()
+            # Узнаём количество строк в words.txt
+            amount_of_lines = len(file.readlines())
+            while True:
+                # Генерируем число, которое равносильно номеру строки в файле words.txt
+                a_number = random.randint(1, amount_of_lines)
+                if a_number not in self.completed_words:
+                    self.completed_words.append(a_number)
+                    break
 
         return a_number
 
@@ -746,44 +726,42 @@ class Training(QWidget):
         if not os.path.isfile("answers"):
             find_answers(self)
 
-        t = open("answers")
-        the_answer = None
-        x = 1
-        # Пока не дошли до ответа для загаданного слова...
-        while x <= number:
-            # Читаем строки и увеличиваем счётчик
-            the_answer = t.readline()
-            x += 1
+        with open("answers") as file:
+            the_answer = None
+            x = 1
+            # Пока не дошли до ответа для загаданного слова...
+            while x <= number:
+                # Читаем строки и увеличиваем счётчик
+                the_answer = file.readline()
+                x += 1
 
-        # Отрезаем перевод строки
-        the_answer = the_answer.rstrip("\n")
+            # Отрезаем перевод строки
+            the_answer = the_answer.rstrip("\n")
 
-        # Переменная отвечает за то, множественный ли ответ для слова или нет
-        is_multiple_answer = False
-        # Определяем, множественный ли ответ, по наличию "/" в нём
-        for y in the_answer:
-            if y == "/":
-                is_multiple_answer = True
-                break
-
-        # Если ответ множественный...
-        if is_multiple_answer:
-            # Ищем все числа-ответы, перебирая строку с ответом исключая "/"
-            the_multiple_answer = []
+            # Переменная отвечает за то, множественный ли ответ для слова или нет
+            is_multiple_answer = False
+            # Определяем, множественный ли ответ, по наличию "/" в нём
             for y in the_answer:
-                if y != "/":
-                    # Записываем возможные ответы в переменную-список в типе int
-                    the_multiple_answer.append(int(y))
-            t.close()
-            # Возвращаем список с ответами
-            return the_multiple_answer
-        # Если ответ является единичным, то делаем его списком
-        else:
-            the_answer = int(the_answer)
-            the_answer = [the_answer]
-            t.close()
-            # Возвращаем единичный ответ в виде списка
-            return the_answer
+                if y == "/":
+                    is_multiple_answer = True
+                    break
+
+            # Если ответ множественный...
+            if is_multiple_answer:
+                # Ищем все числа-ответы, перебирая строку с ответом исключая "/"
+                the_multiple_answer = []
+                for y in the_answer:
+                    if y != "/":
+                        # Записываем возможные ответы в переменную-список в типе int
+                        the_multiple_answer.append(int(y))
+                # Возвращаем список с ответами
+                return the_multiple_answer
+            # Если ответ является единичным, то делаем его списком
+            else:
+                the_answer = int(the_answer)
+                the_answer = [the_answer]
+                # Возвращаем единичный ответ в виде списка
+                return the_answer
 
 
 class Results(QWidget):
@@ -920,21 +898,9 @@ def find_answers(calling_window):
 Просматривает файл words.txt и на основе заглавных букв в словах составляет
 файл с ответами - answers."""
 
-    # Если не был обнаружен words.txt, то создаём его и заполняем несколькими словами
-    # и сообщаем о ненахождении
-    if not os.path.isfile("words.txt"):
-        QMessageBox.question(calling_window, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
-                                                          файлом. Он будет создан и заполнен несколькими словами. \
-                                                          Пожалуйста, поместите исходный файл \"words.txt\" или \
-                                                          настройте его самостоятельно в соответствии с инструкцией в \
-                                                          \"README.txt\".",
-                             QMessageBox.Ok)
-        filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
-        file = open("words.txt", "w")
-        file.write(filler)
-        file.close()
+    check_words_existence(calling_window)
 
-    t = open("answers", "w")
+    ans = open("answers", "w")
     file = open("words.txt")
 
     while True:
@@ -964,24 +930,42 @@ def find_answers(calling_window):
                 amount_of_vowels += 1
                 if not found_percussive_vowel:
                     found_percussive_vowel = True
-                    t.write(str(amount_of_vowels))
+                    ans.write(str(amount_of_vowels))
                 elif found_percussive_vowel:
-                    t.write("/")
-                    t.write(str(amount_of_vowels))
+                    ans.write("/")
+                    ans.write(str(amount_of_vowels))
 
-        t.write("\n")  # Перевод строки после записи ответа для слова
+        ans.write("\n")  # Перевод строки после записи ответа для слова
 
     file.close()
-    t.close()
+    ans.close()
 
 
 def check_settings_existence():
     """Проверяет наличие settings.ini и если не обнаруживает файл, то создаёт его."""
+
     if not os.path.isfile("settings.ini"):
         filler = "default=10\nrepeat_amount=3\nauto_next=1\nauto_time=1000\n"
-        file = open("settings.ini", "w")
-        file.write(filler)
-        file.close()
+        with open("settings.ini", "w") as file:
+            file.write(filler)
+
+
+def check_words_existence(calling_window):
+    """Если не был обнаружен words.txt, то создаём его и заполняем несколькими
+словами и сообщаем о ненахождении."""
+
+    if not os.path.isfile("words.txt"):
+        QMessageBox.question(calling_window, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
+                                                              файлом. Он будет создан и заполнен несколькими словами. \
+                                                              Пожалуйста, поместите исходный файл \"words.txt\" или \
+                                                              настройте его самостоятельно в соответствии с инструкцией в \
+                                                              \"README.txt\".",
+                             QMessageBox.Ok)
+
+        filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
+
+        with open("words.txt", "w") as file:
+            file.write(filler)
 
 
 def extract_settings():
@@ -989,19 +973,18 @@ def extract_settings():
     global default_amount, next_question_delay, repeats_amount, is_auto_next
 
     check_settings_existence()
-    file = open("settings.ini")
 
-    for param in file.readlines():
-        if "default=" in param:
-            default_amount = int(param.lstrip("default="))
-        elif "repeat_amount=" in param:
-            repeats_amount = int(param.lstrip("repeat_amount="))
-        elif "auto_next=" in param:
-            is_auto_next = bool(int(param.lstrip("auto_next=")))
-        elif "auto_time=" in param:
-            next_question_delay = int(param.lstrip("auto_time="))
+    with open("settings.ini") as file:
 
-    file.close()
+        for param in file.readlines():
+            if "default=" in param:
+                default_amount = int(param.lstrip("default="))
+            elif "repeat_amount=" in param:
+                repeats_amount = int(param.lstrip("repeat_amount="))
+            elif "auto_next=" in param:
+                is_auto_next = bool(int(param.lstrip("auto_next=")))
+            elif "auto_time=" in param:
+                next_question_delay = int(param.lstrip("auto_time="))
 
 
 def clear_globals():
