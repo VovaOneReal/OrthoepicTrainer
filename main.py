@@ -221,6 +221,10 @@ class About(QWidget):
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
+        self.ui.pb_changelog.setObjectName("link")
+
+        self.ui.pb_changelog.clicked.connect(self.open_changelog)
+
         global is_dark_mode
         if is_dark_mode:
             self.ui.l_link.setText(
@@ -228,6 +232,15 @@ class About(QWidget):
 
         # Позволяю открывать внешние ссылки
         self.ui.l_link.setOpenExternalLinks(True)
+
+    @Slot()
+    def open_changelog(self):
+        if not os.path.isfile("CHANGELOG.txt"):
+            QMessageBox.question(self, "Внимание!", "Файл \"CHANGELOG.txt\" не был обнаружен в директории с исполняемым \
+файлом. Для ознакомления со списком изменений вы можете обратиться к репозиторию на GitHub по ссылке выше.",
+                                 QMessageBox.Ok)
+        else:
+            os.startfile("CHANGELOG.txt")
 
 
 class Settings(QWidget):
@@ -349,14 +362,23 @@ class Training(QWidget):
         else:
             i_back = QIcon(QPixmap(":/icons/back.png"))
             self.ui.pb_back.setIcon(i_back)
+            i_end_training = QIcon(QPixmap(":/icons/end_training.png"))
+            self.ui.pb_end_training.setIcon(i_end_training)
+            i_hard_word = QIcon(QPixmap(":/icons/hard_word.png"))
+            self.ui.pb_hard_word.setIcon(i_hard_word)
+            i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
+            self.ui.pb_delete_word.setIcon(i_delete_word)
 
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
         self.ui.progressBar.setObjectName("training-prb")
-        self.ui.pb_next.setObjectName("context-button")
+        self.ui.pb_delete_word.setObjectName("training-context-button")
+        self.ui.pb_back.setObjectName("training-context-button")
+        self.ui.pb_hard_word.setObjectName("training-context-button")
+        self.ui.pb_end_training.setObjectName("training-context-button")
         self.ui.l_example.setObjectName("example")
         self.ui.pb_next.setObjectName("next")
-        self.ui.pb_back.setObjectName("training-context-button")
+
 
         # Функционал кнопок
         self.ui.pb_next.clicked.connect(self.next_question)
@@ -916,7 +938,7 @@ class Results(QWidget):
         # Ответили на 99%-75% вопросов
         elif first_grade > score >= second_grade:
             self.ui.l_comment.setText("Вы весьма неплохо справляетесь! В следующий раз у вас получится \
-набрать 100%.")
+ответить на все вопросы!")
 
         # Ответили на 74%-50%
         elif second_grade > score >= third_grade:

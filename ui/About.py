@@ -45,14 +45,15 @@ class Ui_About(object):
         self.l_version.setGeometry(QRect(50, 110, 181, 16))
         self.l_version.setFont(font1)
         self.l_version.setAlignment(Qt.AlignCenter)
-        self.l_changelog = QLabel(About)
-        self.l_changelog.setObjectName(u"l_changelog")
-        self.l_changelog.setGeometry(QRect(80, 130, 121, 16))
+        self.pb_changelog = QPushButton(About)
+        self.pb_changelog.setObjectName(u"pb_changelog")
+        self.pb_changelog.setGeometry(QRect(80, 125, 121, 21))
         font2 = QFont()
         font2.setFamily(u"Roboto")
-        font2.setPointSize(9)
-        self.l_changelog.setFont(font2)
-        self.l_changelog.setAlignment(Qt.AlignCenter)
+        font2.setPointSize(8)
+        self.pb_changelog.setFont(font2)
+        self.pb_changelog.setCursor(QCursor(Qt.PointingHandCursor))
+        self.pb_changelog.setFlat(True)
 
         self.retranslateUi(About)
 
@@ -64,6 +65,6 @@ class Ui_About(object):
         self.l_author.setText(QCoreApplication.translate("About", u"<html><head/><body><p align=\"center\">\u0420\u0430\u0437\u0440\u0430\u0431\u043e\u0442\u0447\u0438\u043a<br/>Vladimir T. (VovaOne)</p></body></html>", None))
         self.l_link.setText(QCoreApplication.translate("About", u"<html><head/><body><p><a href=\"https://github.com/VovaOneReal/OrthoepicTrainer\"><span style=\" text-decoration: underline; color:#0000ff;\">\u041f\u0440\u043e\u0435\u043a\u0442 \u043d\u0430 GitHub</span></a></p></body></html>", None))
         self.l_version.setText(QCoreApplication.translate("About", u"v.2.2 (\u043e\u0442 xx.05.21) \u00a9 2021 \u0433.", None))
-        self.l_changelog.setText(QCoreApplication.translate("About", u"\u0421\u043f\u0438\u0441\u043e\u043a \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439", None))
+        self.pb_changelog.setText(QCoreApplication.translate("About", u"\u0421\u043f\u0438\u0441\u043e\u043a \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439", None))
     # retranslateUi
 

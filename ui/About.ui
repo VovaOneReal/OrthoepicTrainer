@@ -96,26 +96,29 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="l_changelog">
+  <widget class="QPushButton" name="pb_changelog">
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>130</y>
+     <y>125</y>
      <width>121</width>
-     <height>16</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Roboto</family>
-     <pointsize>9</pointsize>
+     <pointsize>8</pointsize>
     </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
    </property>
    <property name="text">
     <string>Список изменений</string>
    </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+   <property name="flat">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
