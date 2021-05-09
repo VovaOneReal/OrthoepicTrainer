@@ -14,6 +14,10 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
+# TODO: Проверка наличия файлов стилей
+# TODO: Может быть стоит сделать зависимость от длины completed_words[], когда дело касается прогресса тренировки.
+# TODO: Возможно действительно стоит ввести Одиночку для использования глобальных переменных
+
 # Служебные переменные --------------------------------------------------------
 
 lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
@@ -28,10 +32,14 @@ is_repeat = False  # Режим повтора
 
 is_dark_mode = False
 
-next_question_delay = 1000
-repeats_amount = 3
 default_amount = 10
+repeats_amount = 3
+is_reset_progress = False
+is_mix_words = False
+is_smart_offer = True
+triggering_threshold = 2
 is_auto_next = True
+next_question_delay = 1000
 
 # Экземпляры классов окон -----------------------------------------------------
 
@@ -243,7 +251,8 @@ class Settings(QWidget):
         # Даю функционал кнопкам
         self.ui.pb_save.clicked.connect(self.save_settings)
         self.ui.pb_cancel.clicked.connect(self.close)
-        self.ui.cb_1.clicked.connect(self.check_cb_state)
+        self.ui.cb_1.clicked.connect(lambda x=self.ui.cb_1, y=self.ui.sb_3: self.check_cb_state(x, y))
+        self.ui.cb_3.clicked.connect(lambda x=self.ui.cb_3, y=self.ui.sb_4: self.check_cb_state(x, y))
 
         # Актуализирую отображение сохранённых раннее настроек
         self.update_settings()
@@ -255,25 +264,30 @@ class Settings(QWidget):
         with open("settings.ini", "w") as file:
             file.write("default=" + str(self.ui.sb_1.value()) + "\n")
             file.write("repeat_amount=" + str(self.ui.sb_2.value()) + "\n")
-
-            # Для интерпретации типа bool в удобный мне int
-            if self.ui.cb_1.isChecked():
-                auto_next_value = 1
-            else:
-                auto_next_value = 0
-            file.write("auto_next=" + str(auto_next_value) + "\n")
-
+            file.write("is_reset_progress=" + str(self.cb_int_state(self.ui.cb_2)) + "\n")
+            file.write("is_mix_words=" + str(self.cb_int_state(self.ui.cb_4)) + "\n")
+            file.write("is_smart_offer=" + str(self.cb_int_state(self.ui.cb_3)) + "\n")
+            file.write("triggering_threshold=" + str(self.ui.sb_4.value()) + "\n")
+            file.write("auto_next=" + str(self.cb_int_state(self.ui.cb_1)) + "\n")
             file.write("auto_time=" + str(self.ui.sb_3.value()) + "\n")
 
         self.close()
+
+    @staticmethod
+    def cb_int_state(checkbox):
+        """Интерпретирует состояние checkbox из bool в int и возвращает его."""
+        if checkbox.isChecked():
+            return 1
+        else:
+            return 0
 
     def update_settings(self):
         """Просматривает "Settings.ini" и восстанавливает значения из него."""
 
         check_settings_existence()
 
-        with open("settings.ini") as s:
-            for param in s.readlines():
+        with open("settings.ini") as file:
+            for param in file.readlines():
                 param = param.rstrip("\n")
                 if "default=" in param:
                     default_value = int(param.lstrip("default="))
@@ -281,20 +295,34 @@ class Settings(QWidget):
                 elif "repeat_amount=" in param:
                     repeat_amount_value = int(param.lstrip("repeat_amount="))
                     self.ui.sb_2.setValue(repeat_amount_value)
+                elif "is_reset_progress=" in param:
+                    reset_progress_value = bool(int(param.lstrip("is_reset_progress=")))
+                    self.ui.cb_2.setChecked(reset_progress_value)
+                elif "is_mix_words=" in param:
+                    mix_words_value = bool(int(param.lstrip("is_mix_words=")))
+                    self.ui.cb_4.setChecked(mix_words_value)
+                elif "is_smart_offer=" in param:
+                    smart_offer_value = bool(int(param.lstrip("is_smart_offer=")))
+                    self.ui.cb_3.setChecked(smart_offer_value)
+                    self.check_cb_state(self.ui.cb_3, self.ui.sb_4)
+                elif "triggering_threshold=" in param:
+                    triggering_threshold_value = int(param.lstrip("triggering_threshold="))
+                    self.ui.sb_4.setValue(triggering_threshold_value)
                 elif "auto_next=" in param:
                     auto_next_value = bool(int(param.lstrip("auto_next=")))
                     self.ui.cb_1.setChecked(auto_next_value)
-                    self.check_cb_state()
+                    self.check_cb_state(self.ui.cb_1, self.ui.sb_3)
                 elif "auto_time=" in param:
                     auto_time_value = int(param.lstrip("auto_time="))
                     self.ui.sb_3.setValue(auto_time_value)
 
-    def check_cb_state(self):
-        """Блокирует спин-бокс, если выключен параметр автоматического перехода."""
-        if not self.ui.cb_1.isChecked():
-            self.ui.sb_3.setDisabled(True)
+    @staticmethod
+    def check_cb_state(checkbox, spinbox):
+        """Блокирует спин-бокс, если относящийся к нему чек-бокс выключен."""
+        if not checkbox.isChecked():
+            spinbox.setDisabled(True)
         else:
-            self.ui.sb_3.setDisabled(False)
+            spinbox.setDisabled(False)
 
 
 class Training(QWidget):
@@ -356,12 +384,14 @@ class Training(QWidget):
             self.whole_progress_value = 0
 
             # Определение максимального значения для прогресс-бара
-            pbm = 0
+            pbm = 0  # pbm - Progress Bar M... я не помню что значит 'm'. Впрочем, это не важно.
             for v in self.word_progress:
                 pbm += v
                 self.whole_progress_value = pbm
             self.ui.progressBar.setMaximum(pbm)
             self.ui.progressBar.setValue(1)
+
+            self.ui.l_stats.hide()  # Скрываю текст со статистикой.
 
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
 
@@ -386,6 +416,8 @@ class Training(QWidget):
 
         # Скрываем кнопку "далее"
         self.ui.pb_next.hide()
+
+        self.update_stats()
 
         selected_word = None  # Для хранения выбранного слова
         if not is_repeat:
@@ -516,6 +548,22 @@ class Training(QWidget):
             for v in self.word_progress:
                 pbm += v
             self.ui.progressBar.setValue(self.whole_progress_value - pbm + 1)
+
+    def update_stats(self):
+        """Обновление текста со статистикой."""
+        global questions_amount, bad_words, score
+        incorrect_amount = len(bad_words)
+        whole_amount = questions_amount - len(self.completed_words)
+        correct_amount = score
+        the_text = "<span style='font-weight: bold;'>" + \
+                   "<span style='color: red;'>" + \
+                   str(incorrect_amount) + \
+                   "</span>" + \
+                   "    |   " + str(whole_amount) + \
+                   "    |   <span style='color: green;'>" + str(correct_amount) + \
+                   "</span>" + \
+                   "</span>"
+        self.ui.l_stats.setText(the_text)
 
     def show_buttons(self):
         """Показывает кнопки в зависимости от количества букв в текущем слове."""
@@ -654,7 +702,7 @@ class Training(QWidget):
     def incorrect(self):
         """Вызывается, если на вопрос был дан неверный ответ."""
 
-        global next_question_delay, bad_words, is_auto_next, is_repeat
+        global next_question_delay, bad_words, is_auto_next, is_repeat, is_reset_progress, repeats_amount
 
         # Отключение происходит сразу же, чтобы пользователь больше не нажимал
         # на кнопки с последствиями
@@ -663,6 +711,10 @@ class Training(QWidget):
         # НЕ в режиме повторения добавляем ошибочное слово в список для дальнейшего повторения
         if not is_repeat:
             bad_words.append(self.current_word)
+        # В режиме повторения, если включена опция, сбрасываем прогресс для слова,
+        # если ответ на него неверен
+        elif is_repeat and is_reset_progress:
+            self.word_progress[self.current_repeat_w] = repeats_amount
 
         # Меняем стиль виджетов
         self.ui.l_header.setText("Неправильно!")
@@ -945,7 +997,8 @@ def check_settings_existence():
     """Проверяет наличие settings.ini и если не обнаруживает файл, то создаёт его."""
 
     if not os.path.isfile("settings.ini"):
-        filler = "default=10\nrepeat_amount=3\nauto_next=1\nauto_time=1000\n"
+        filler = "default=10\nrepeat_amount=3\nis_reset_progress=0\nis_mix_words=0\nis_smart_offer=1\n" + \
+                 "triggering_threshold=2\nauto_next=1\nauto_time=1000\n"
         with open("settings.ini", "w") as file:
             file.write(filler)
 
@@ -970,10 +1023,10 @@ def check_words_existence(calling_window):
 
 def extract_settings():
     """Сохраняет значения из файла настроек в соответствующие глобальные переменные."""
-    global default_amount, next_question_delay, repeats_amount, is_auto_next
+    global default_amount, next_question_delay, repeats_amount, is_auto_next, \
+        is_reset_progress, is_mix_words, is_smart_offer, triggering_threshold
 
     check_settings_existence()
-
     with open("settings.ini") as file:
 
         for param in file.readlines():
@@ -985,6 +1038,14 @@ def extract_settings():
                 is_auto_next = bool(int(param.lstrip("auto_next=")))
             elif "auto_time=" in param:
                 next_question_delay = int(param.lstrip("auto_time="))
+            elif "is_reset_progress=" in param:
+                is_reset_progress = bool(int(param.lstrip("is_reset_progress=")))
+            elif "is_mix_words=" in param:
+                is_mix_words = bool(int(param.lstrip("is_mix_words=")))
+            elif "is_smart_offer=" in param:
+                is_smart_offer = bool(int(param.lstrip("is_smart_offer=")))
+            elif "triggering_threshold=" in param:
+                triggering_threshold = int(param.lstrip("triggering_threshold="))
 
 
 def clear_globals():

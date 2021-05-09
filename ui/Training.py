@@ -75,7 +75,7 @@ class Ui_Training(object):
         self.pb_back.setIconSize(QSize(16, 16))
         self.l_stats = QLabel(Training)
         self.l_stats.setObjectName(u"l_stats")
-        self.l_stats.setGeometry(QRect(180, 430, 431, 20))
+        self.l_stats.setGeometry(QRect(180, 425, 431, 20))
         font1 = QFont()
         font1.setFamily(u"Roboto")
         font1.setPointSize(10)
