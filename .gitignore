@@ -254,3 +254,4 @@ build.bat
 /words.txt.bak
 settings.ini
 *.bak
+hard_words.txt

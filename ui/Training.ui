@@ -101,7 +101,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>(Съешь же ещё этих...)</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -123,8 +123,8 @@
   <widget class="QPushButton" name="pb_back">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>90</y>
+     <x>20</x>
+     <y>25</y>
      <width>31</width>
      <height>31</height>
     </rect>
@@ -232,7 +232,7 @@
   <widget class="QPushButton" name="pb_hard_word">
    <property name="geometry">
     <rect>
-     <x>710</x>
+     <x>410</x>
      <y>90</y>
      <width>31</width>
      <height>31</height>
@@ -319,7 +319,7 @@
   <widget class="QPushButton" name="pb_end_training">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>350</x>
      <y>90</y>
      <width>31</width>
      <height>31</height>
@@ -406,7 +406,7 @@
   <widget class="QPushButton" name="pb_delete_word">
    <property name="geometry">
     <rect>
-     <x>750</x>
+     <x>450</x>
      <y>90</y>
      <width>31</width>
      <height>31</height>

@@ -29,7 +29,7 @@ QLabel#header {
 }
 
 QPushButton#start-button {
-    border-radius: 15px;
+    border-radius: 20px;
     background-color: #80BFFF;
     font-weight: bold;
 }
@@ -59,7 +59,7 @@ QPushButton#context-button:pressed {
 /*-------------------Окно авторов-------------------*/
 
 QPushButton#link {
-    color: blue;
+    text-decoration: underline;
 }
 
 /*-------------------Окно тренировки-------------------*/
@@ -188,6 +188,7 @@ QProgressBar#training-prb-incorr::chunk {
 
 QLabel#grade {
     font-size: 12pt;
+    font-weight: bold;
 }
 
 QLabel#comment{

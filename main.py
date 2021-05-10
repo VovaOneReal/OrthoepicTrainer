@@ -14,9 +14,8 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
-# TODO: Проверка наличия файлов стилей
-# TODO: Может быть стоит сделать зависимость от длины completed_words[], когда дело касается прогресса тренировки.
-# TODO: Возможно действительно стоит ввести Одиночку для использования глобальных переменных
+# TODO: не обновляется значение статистики при "Ещё раз".
+# TODO: Скрытие кнопки "повторение", если были ошибки в словах
 
 # Служебные переменные --------------------------------------------------------
 
@@ -97,6 +96,8 @@ class MainWindow(QMainWindow):
         # Даю элементам интерфейса имена для стилей
         self.ui.l_header.setObjectName("header")
         self.ui.pb_start.setObjectName("start-button")
+        self.ui.pb_all.setObjectName("context-button")
+        self.ui.pb_standart.setObjectName("context-button")
         self.ui.pb_about.setObjectName("context-button")
         self.ui.pb_settings.setObjectName("context-button")
         self.ui.pb_night.setObjectName("context-button")
@@ -105,6 +106,8 @@ class MainWindow(QMainWindow):
         self.ui.pb_about.clicked.connect(self.show_about)
         self.ui.pb_settings.clicked.connect(self.show_settings)
         self.ui.pb_start.clicked.connect(self.start)
+        self.ui.pb_all.clicked.connect(self.training_all_words)
+        self.ui.pb_standart.clicked.connect(self.training_standard)
         self.ui.pb_night.clicked.connect(self.night_mode)
 
     @Slot()
@@ -115,9 +118,9 @@ class MainWindow(QMainWindow):
 
         # Включение тёмной темы
         if not is_dark_mode:
-            with open("style-dark.qss", "r") as f:
-                _style = f.read()
-                app.setStyleSheet(_style)
+            with open("style-dark.qss", "r") as file:
+                _app_style = file.read()
+                app.setStyleSheet(_app_style)
                 is_dark_mode = True
 
             # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
@@ -133,9 +136,9 @@ class MainWindow(QMainWindow):
 
         # Выключение тёмной темы
         elif is_dark_mode:
-            with open("style.qss", "r") as f:
-                _style = f.read()
-                app.setStyleSheet(_style)
+            with open("style.qss", "r") as file:
+                _app_style = file.read()
+                app.setStyleSheet(_app_style)
                 is_dark_mode = False
 
             # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
@@ -193,6 +196,18 @@ class MainWindow(QMainWindow):
         training_window.show()
         self.close()
 
+    @Slot()
+    def training_all_words(self):
+        """Запускает тренировку со всеми словами."""
+        self.ui.le_word_amount.setText("0")
+        self.start()
+
+    @Slot()
+    def training_standard(self):
+        """Запускает тренировку со кол-вом слов по-умолчанию."""
+        self.ui.le_word_amount.setText(".")
+        self.start()
+
     def get_amount_of_lines(self):
         """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
 Просматривает файл words.txt и определяет количество строк (слов) в файле."""
@@ -223,7 +238,7 @@ class About(QWidget):
 
         self.ui.pb_changelog.setObjectName("link")
 
-        self.ui.pb_changelog.clicked.connect(self.open_changelog)
+        self.ui.pb_changelog.clicked.connect(self.open_news)
 
         global is_dark_mode
         if is_dark_mode:
@@ -234,13 +249,13 @@ class About(QWidget):
         self.ui.l_link.setOpenExternalLinks(True)
 
     @Slot()
-    def open_changelog(self):
-        if not os.path.isfile("CHANGELOG.txt"):
-            QMessageBox.question(self, "Внимание!", "Файл \"CHANGELOG.txt\" не был обнаружен в директории с исполняемым \
+    def open_news(self):
+        if not os.path.isfile("NEWS.txt"):
+            QMessageBox.question(self, "Внимание!", "Файл \"NEWS.txt\" не был обнаружен в директории с исполняемым \
 файлом. Для ознакомления со списком изменений вы можете обратиться к репозиторию на GitHub по ссылке выше.",
                                  QMessageBox.Ok)
         else:
-            os.startfile("CHANGELOG.txt")
+            os.startfile("NEWS.txt")
 
 
 class Settings(QWidget):
@@ -369,6 +384,11 @@ class Training(QWidget):
             i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
             self.ui.pb_delete_word.setIcon(i_delete_word)
 
+        # ВРЕМЕННОЕ СКРЫТИЕ КНОПОК
+        self.ui.pb_end_training.hide()
+        self.ui.pb_delete_word.hide()
+        self.ui.pb_hard_word.hide()
+
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
         self.ui.progressBar.setObjectName("training-prb")
@@ -378,7 +398,6 @@ class Training(QWidget):
         self.ui.pb_end_training.setObjectName("training-context-button")
         self.ui.l_example.setObjectName("example")
         self.ui.pb_next.setObjectName("next")
-
 
         # Функционал кнопок
         self.ui.pb_next.clicked.connect(self.next_question)
@@ -395,11 +414,11 @@ class Training(QWidget):
         self.word_progress = []  # Для хранения прогресса слов на повторении
 
         global questions_amount, is_repeat, repeats_amount, bad_words
-        # Настрока прогресс-бара
+        # Настройка прогресс-бара
         self.ui.progressBar.setMaximum(questions_amount)
         self.ui.progressBar.setValue(self.current_question)
 
-        # Определение параметров, если класс был запущен в режиме повторения
+        # ОПРЕДЕЛЕНИЕ ПАРАМЕТРОВ, ЕСЛИ КЛАСС БЫЛ ЗАПУЩЕН В РЕЖИМЕ ПОВТОРЕНИЯ
         if is_repeat:
             # Определение прогресса для каждого слова для повторения
             self.word_progress = [repeats_amount] * len(bad_words)
@@ -414,7 +433,12 @@ class Training(QWidget):
             self.ui.progressBar.setValue(1)
 
             self.ui.l_stats.hide()  # Скрываю текст со статистикой.
+            self.ui.pb_end_training.setDisabled(True)
+            self.ui.pb_hard_word.setDisabled(True)
+            self.ui.pb_delete_word.setDisabled(True)
 
+        self.update_stats()  # Обновляем статистику (на всякий случай (когда я говорю "на всякий случай"
+        # это значит, что наличию этой строки есть объяснение и её нельзя убирать.))
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
 
     def question(self):
@@ -527,7 +551,7 @@ class Training(QWidget):
         """Вызывается, когда включён режим повторения. Возвращает ID вопросного слова из списка с ошибками проходясь
 по ним по очереди."""
 
-        global bad_words
+        global bad_words, is_mix_words
 
         # Если все слова повторены - собираемся выходить из повторения
         if self.word_progress.count(0) == len(self.word_progress):
@@ -536,8 +560,12 @@ class Training(QWidget):
 
         # Ищем слово, которое ещё нужно повторить
         while True:
-            # Смотрим следующее слово...
-            self.current_repeat_w += 1
+            if is_mix_words:
+                # Если включена опция - вытаскиваем случайное слово
+                self.current_repeat_w = random.randint(0, len(bad_words))
+            else:
+                # Иначе, смотрим слова по порядку...
+                self.current_repeat_w += 1
             # ...и проверяем, чтобы мы не вышли за границы дозволенного
             if self.current_repeat_w >= len(bad_words):
                 self.current_repeat_w = 0
@@ -724,7 +752,8 @@ class Training(QWidget):
     def incorrect(self):
         """Вызывается, если на вопрос был дан неверный ответ."""
 
-        global next_question_delay, bad_words, is_auto_next, is_repeat, is_reset_progress, repeats_amount
+        global next_question_delay, bad_words, is_auto_next, is_repeat, is_reset_progress, repeats_amount, \
+            is_smart_offer
 
         # Отключение происходит сразу же, чтобы пользователь больше не нажимал
         # на кнопки с последствиями
@@ -733,6 +762,9 @@ class Training(QWidget):
         # НЕ в режиме повторения добавляем ошибочное слово в список для дальнейшего повторения
         if not is_repeat:
             bad_words.append(self.current_word)
+
+            if is_smart_offer:
+                self.smart_add()
         # В режиме повторения, если включена опция, сбрасываем прогресс для слова,
         # если ответ на него неверен
         elif is_repeat and is_reset_progress:
@@ -760,6 +792,15 @@ class Training(QWidget):
             a_timer.start()
         else:
             self.ui.pb_next.show()
+
+    def smart_add(self):
+
+        if not os.path.isfile("hard_words.txt"):
+            with open("hard_words.txt", "w") as file:
+                pass
+
+        with open("hard_words.txt", "a") as file:
+            file.write("\n" + self.a_word + ":1")
 
     def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""

@@ -56,6 +56,12 @@ QPushButton#context-button:pressed {
     background-color: #3091f2;
 }
 
+/*-------------------Окно авторов-------------------*/
+
+QPushButton#link {
+    text-decoration: underline;
+}
+
 /*-------------------Окно тренировки-------------------*/
 
 /*Базовые стили*/
