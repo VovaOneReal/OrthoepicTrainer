@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Орфоэпический тренажёр v.2.0</string>
+   <string>Орфоэпический тренажёр</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -37,9 +37,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>360</y>
+      <y>330</y>
       <width>261</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -106,10 +106,10 @@
    <widget class="QLabel" name="l_description">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>100</y>
-      <width>581</width>
-      <height>241</height>
+      <x>140</x>
+      <y>150</y>
+      <width>511</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="font">
@@ -119,7 +119,7 @@
      </font>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Вам по очереди будут показаны слова без ударений. Ваша задача - выбрать ту гласную, на которую падает ударение.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;В поле ниже вы можете ввести количество слов, которые вы будете тренировать.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Введя &amp;quot;0&amp;quot;, вы будете тренировать все слова.&lt;br/&gt;Оставив ввод пустым, вы будете тренировать количество слов по-умолчанию.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Вам по очереди будут показаны слова без ударений. Ваша задача - выбрать ту гласную, на которую падает ударение.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;В поле ниже вы можете ввести количество слов, которые вы будете тренировать.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="textFormat">
      <enum>Qt::RichText</enum>
@@ -189,6 +189,44 @@
       <width>16</width>
       <height>16</height>
      </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_all">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>370</y>
+      <width>126</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Все слова</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_standart">
+    <property name="geometry">
+     <rect>
+      <x>395</x>
+      <y>370</y>
+      <width>126</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>По-умолчанию</string>
     </property>
    </widget>
   </widget>

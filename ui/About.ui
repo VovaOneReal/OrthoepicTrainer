@@ -29,7 +29,7 @@
    <iconset>
     <normaloff>../materials/icon.ico</normaloff>../materials/icon.ico</iconset>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="l_author">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -52,7 +52,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="l_link">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -74,11 +74,11 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QLabel" name="l_version">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>120</y>
+     <y>110</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -90,10 +90,35 @@
     </font>
    </property>
    <property name="text">
-    <string>v.2.1 (от 05.05.21) © 2021 г.</string>
+    <string>v.2.2 (от 13.05.21) © 2021 г.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pb_changelog">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>125</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Roboto</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>Список изменений</string>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

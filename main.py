@@ -28,15 +28,20 @@ is_repeat = False  # Режим повтора
 
 is_dark_mode = False
 
-next_question_delay = 1000
-repeats_amount = 3
 default_amount = 10
+repeats_amount = 3
+is_reset_progress = False
+is_mix_words = False
+is_smart_offer = True
+triggering_threshold = 2
 is_auto_next = True
+next_question_delay = 1000
 
 # Экземпляры классов окон -----------------------------------------------------
 
 main_window = None
 training_window = None
+
 
 # -----------------------------------------------------------------------------
 
@@ -50,7 +55,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Создаю экземпляры различных окон
+        # Создаю экземпляры дочерних окон
         self.about = None
         self.settings = None
 
@@ -88,6 +93,8 @@ class MainWindow(QMainWindow):
         # Даю элементам интерфейса имена для стилей
         self.ui.l_header.setObjectName("header")
         self.ui.pb_start.setObjectName("start-button")
+        self.ui.pb_all.setObjectName("context-button")
+        self.ui.pb_standart.setObjectName("context-button")
         self.ui.pb_about.setObjectName("context-button")
         self.ui.pb_settings.setObjectName("context-button")
         self.ui.pb_night.setObjectName("context-button")
@@ -96,6 +103,8 @@ class MainWindow(QMainWindow):
         self.ui.pb_about.clicked.connect(self.show_about)
         self.ui.pb_settings.clicked.connect(self.show_settings)
         self.ui.pb_start.clicked.connect(self.start)
+        self.ui.pb_all.clicked.connect(self.training_all_words)
+        self.ui.pb_standart.clicked.connect(self.training_standard)
         self.ui.pb_night.clicked.connect(self.night_mode)
 
     @Slot()
@@ -106,9 +115,9 @@ class MainWindow(QMainWindow):
 
         # Включение тёмной темы
         if not is_dark_mode:
-            with open("style-dark.qss", "r") as f:
-                _style = f.read()
-                app.setStyleSheet(_style)
+            with open("style-dark.qss", "r") as file:
+                _app_style = file.read()
+                app.setStyleSheet(_app_style)
                 is_dark_mode = True
 
             # Устанавливаю НОЧНЫЕ иконки для кнопок в окне
@@ -124,9 +133,9 @@ class MainWindow(QMainWindow):
 
         # Выключение тёмной темы
         elif is_dark_mode:
-            with open("style.qss", "r") as f:
-                _style = f.read()
-                app.setStyleSheet(_style)
+            with open("style.qss", "r") as file:
+                _app_style = file.read()
+                app.setStyleSheet(_app_style)
                 is_dark_mode = False
 
             # Устанавливаю СВЕТЛЫЕ иконки для кнопок в окне
@@ -168,7 +177,8 @@ class MainWindow(QMainWindow):
         except ValueError:
             entered_amount = default_amount
 
-        self.find_answers()  # Составляем ответы к словам / не перемещать строку дальше след. блока
+        self.amount_of_lines = self.get_amount_of_lines()  # Определяем количество строк (слов)
+        find_answers(self)  # Составляем ответы к словам / не перемещать строку дальше след. блока
 
         # Берём введённое кол-во слов
         if entered_amount <= 0 or entered_amount > self.amount_of_lines:
@@ -182,74 +192,30 @@ class MainWindow(QMainWindow):
         training_window = Training()
         training_window.show()
         self.close()
-        self.clear()
 
-    def find_answers(self):
+    @Slot()
+    def training_all_words(self):
+        """Запускает тренировку со всеми словами."""
+        self.ui.le_word_amount.setText("0")
+        self.start()
+
+    @Slot()
+    def training_standard(self):
+        """Запускает тренировку со кол-вом слов по-умолчанию."""
+        self.ui.le_word_amount.setText(".")
+        self.start()
+
+    def get_amount_of_lines(self):
         """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
-        Просматривает файл words.txt и на основе заглавных букв в словах составляет
-        файл с ответами - answers."""
+Просматривает файл words.txt и определяет количество строк (слов) в файле."""
 
-        # Если не был обнаружен words.txt, то создаём его и заполняем несколькими словами
-        # и сообщаем о ненахождении
-        if not os.path.isfile("words.txt"):
-            QMessageBox.question(self, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым файлом. \
-Он будет создан и заполнен несколькими словами. Пожалуйста, поместите исходный файл \
-\"words.txt\" или настройте его самостоятельно в соответствии с инструкцией в \"README.txt\".",
-                                 QMessageBox.Ok)
-            filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
-            file = open("words.txt", "w")
-            file.write(filler)
-            file.close()
+        check_words_existence(self)
 
         # Открываем соответствующие файлы
-        file = open("words.txt")
-        t = open("answers", "w")
+        with open("words.txt") as file:
+            the_value = len(file.readlines())
 
-        self.amount_of_lines = len(file.readlines())
-        file.close()
-
-        file = open("words.txt")
-
-        while True:
-            # Читаем строку в файле
-            a_line = file.readline()
-            # Отрезаем окончание
-            a_line = a_line.rstrip("\n")
-
-            # Прерываем цикл, если встречается пустая строка - это значит весь файл уже прочитан
-            if not a_line:
-                break
-
-            # Иначе исследуем каждый символ в прочитанной строке, ведь строка - это одно слово.
-            amount_of_vowels = 0
-            # Переменная отвечает за то, была ли уже найдена заглавная буква или ещё нет
-            found_percussive_vowel = False
-
-            for x in a_line:
-                # Если это строчная гласная, то просто увеличиваем количество гласных для этого слова.
-                if x in lower_vowels:
-                    amount_of_vowels += 1
-
-                # Если заглавная (ударная) гласная, то не только увеличиваем их количество, но
-                # и записываем эту гласную как ответ к слову в файл answers,
-                # а если есть и другие ударные гласные, то через "/" записываем и их
-                elif x in upper_vowels:
-                    amount_of_vowels += 1
-                    if not found_percussive_vowel:
-                        found_percussive_vowel = True
-                        t.write(str(amount_of_vowels))
-                    elif found_percussive_vowel:
-                        t.write("/")
-                        t.write(str(amount_of_vowels))
-
-            t.write("\n")  # Перевод строки после записи ответа для слова
-
-        file.close()
-        t.close()
-
-    def clear(self):
-        """Очищает поле с количеством тренируемых слов."""
-        self.ui.le_word_amount.setText("")
+        return the_value
 
 
 class About(QWidget):
@@ -267,12 +233,26 @@ class About(QWidget):
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
+        self.ui.pb_changelog.setObjectName("link")
+
+        self.ui.pb_changelog.clicked.connect(self.open_news)
+
         global is_dark_mode
         if is_dark_mode:
-            self.ui.label_2.setText('<a href="https://github.com/VovaOneReal/OrthoepicTrainer"><span style=" text-decoration: underline; color:#3091f2;">Проект на GitHub</span></a>')
+            self.ui.l_link.setText(
+                '<a href="https://github.com/VovaOneReal/OrthoepicTrainer"><span style=" text-decoration: underline; color:#3091f2;">Проект на GitHub</span></a>')
 
         # Позволяю открывать внешние ссылки
-        self.ui.label_2.setOpenExternalLinks(True)
+        self.ui.l_link.setOpenExternalLinks(True)
+
+    @Slot()
+    def open_news(self):
+        if not os.path.isfile("NEWS.txt"):
+            QMessageBox.question(self, "Внимание!", "Файл \"NEWS.txt\" не был обнаружен в директории с исполняемым \
+файлом. Для ознакомления со списком изменений вы можете обратиться к репозиторию на GitHub по ссылке выше.",
+                                 QMessageBox.Ok)
+        else:
+            os.startfile("NEWS.txt")
 
 
 class Settings(QWidget):
@@ -289,9 +269,11 @@ class Settings(QWidget):
         self.ui.pb_save.setObjectName("context-button")
         self.ui.pb_cancel.setObjectName("context-button")
 
-        # КНОПКИ НОВЫХ ОПЦИЙ СКРЫТЫ
-        self.ui.cb_2.hide()
-        self.ui.l_7.hide()
+        # ВРЕМЕННОЕ СКРЫТИЕ ПУНКТА "УМНОЕ ПРЕДЛОЖЕНИЕ"
+        self.ui.l_8.hide()
+        self.ui.cb_3.hide()
+        self.ui.l_10.hide()
+        self.ui.sb_4.hide()
 
         # Иконка приложения
         i_app = QIcon(QPixmap(":/icon.ico"))
@@ -300,7 +282,8 @@ class Settings(QWidget):
         # Даю функционал кнопкам
         self.ui.pb_save.clicked.connect(self.save_settings)
         self.ui.pb_cancel.clicked.connect(self.close)
-        self.ui.cb_1.clicked.connect(self.check_cb_state)
+        self.ui.cb_1.clicked.connect(lambda x=self.ui.cb_1, y=self.ui.sb_3: self.check_cb_state(x, y))
+        self.ui.cb_3.clicked.connect(lambda x=self.ui.cb_3, y=self.ui.sb_4: self.check_cb_state(x, y))
 
         # Актуализирую отображение сохранённых раннее настроек
         self.update_settings()
@@ -308,51 +291,69 @@ class Settings(QWidget):
     @Slot()
     def save_settings(self):
         """Производит сохранение введённых значений в полях в файл настроек."""
-        file = open("settings.ini", "w")
-        file.write("default=" + str(self.ui.sb_1.value()) + "\n")
-        file.write("repeat_amount=" + str(self.ui.sb_2.value()) + "\n")
 
-        # Для интерпретации типа bool в удобный мне int
-        if self.ui.cb_1.isChecked():
-            auto_next_value = 1
-        else:
-            auto_next_value = 0
-        file.write("auto_next=" + str(auto_next_value) + "\n")
+        with open("settings.ini", "w") as file:
+            file.write("default=" + str(self.ui.sb_1.value()) + "\n")
+            file.write("repeat_amount=" + str(self.ui.sb_2.value()) + "\n")
+            file.write("is_reset_progress=" + str(self.cb_int_state(self.ui.cb_2)) + "\n")
+            file.write("is_mix_words=" + str(self.cb_int_state(self.ui.cb_4)) + "\n")
+            file.write("is_smart_offer=" + str(self.cb_int_state(self.ui.cb_3)) + "\n")
+            file.write("triggering_threshold=" + str(self.ui.sb_4.value()) + "\n")
+            file.write("auto_next=" + str(self.cb_int_state(self.ui.cb_1)) + "\n")
+            file.write("auto_time=" + str(self.ui.sb_3.value()) + "\n")
 
-        file.write("auto_time=" + str(self.ui.sb_3.value()) + "\n")
-        file.close()
         self.close()
+
+    @staticmethod
+    def cb_int_state(checkbox):
+        """Интерпретирует состояние checkbox из bool в int и возвращает его."""
+        if checkbox.isChecked():
+            return 1
+        else:
+            return 0
 
     def update_settings(self):
         """Просматривает "Settings.ini" и восстанавливает значения из него."""
 
         check_settings_existence()
-        s = open("settings.ini")
 
-        for param in s.readlines():
-            param = param.rstrip("\n")
-            if "default=" in param:
-                default_value = int(param.lstrip("default="))
-                self.ui.sb_1.setValue(default_value)
-            elif "repeat_amount=" in param:
-                repeat_amount_value = int(param.lstrip("repeat_amount="))
-                self.ui.sb_2.setValue(repeat_amount_value)
-            elif "auto_next=" in param:
-                auto_next_value = bool(int(param.lstrip("auto_next=")))
-                self.ui.cb_1.setChecked(auto_next_value)
-                self.check_cb_state()
-            elif "auto_time=" in param:
-                auto_time_value = int(param.lstrip("auto_time="))
-                self.ui.sb_3.setValue(auto_time_value)
+        with open("settings.ini") as file:
+            for param in file.readlines():
+                param = param.rstrip("\n")
+                if "default=" in param:
+                    default_value = int(param.lstrip("default="))
+                    self.ui.sb_1.setValue(default_value)
+                elif "repeat_amount=" in param:
+                    repeat_amount_value = int(param.lstrip("repeat_amount="))
+                    self.ui.sb_2.setValue(repeat_amount_value)
+                elif "is_reset_progress=" in param:
+                    reset_progress_value = bool(int(param.lstrip("is_reset_progress=")))
+                    self.ui.cb_2.setChecked(reset_progress_value)
+                elif "is_mix_words=" in param:
+                    mix_words_value = bool(int(param.lstrip("is_mix_words=")))
+                    self.ui.cb_4.setChecked(mix_words_value)
+                elif "is_smart_offer=" in param:
+                    smart_offer_value = bool(int(param.lstrip("is_smart_offer=")))
+                    self.ui.cb_3.setChecked(smart_offer_value)
+                    self.check_cb_state(self.ui.cb_3, self.ui.sb_4)
+                elif "triggering_threshold=" in param:
+                    triggering_threshold_value = int(param.lstrip("triggering_threshold="))
+                    self.ui.sb_4.setValue(triggering_threshold_value)
+                elif "auto_next=" in param:
+                    auto_next_value = bool(int(param.lstrip("auto_next=")))
+                    self.ui.cb_1.setChecked(auto_next_value)
+                    self.check_cb_state(self.ui.cb_1, self.ui.sb_3)
+                elif "auto_time=" in param:
+                    auto_time_value = int(param.lstrip("auto_time="))
+                    self.ui.sb_3.setValue(auto_time_value)
 
-        s.close()
-
-    def check_cb_state(self):
-        """Блокирует спин-бокс, если выключен параметр автоматического перехода."""
-        if not self.ui.cb_1.isChecked():
-            self.ui.sb_3.setDisabled(True)
+    @staticmethod
+    def check_cb_state(checkbox, spinbox):
+        """Блокирует спин-бокс, если относящийся к нему чек-бокс выключен."""
+        if not checkbox.isChecked():
+            spinbox.setDisabled(True)
         else:
-            self.ui.sb_3.setDisabled(False)
+            spinbox.setDisabled(False)
 
 
 class Training(QWidget):
@@ -371,9 +372,6 @@ class Training(QWidget):
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
 
-        # КНОПКА "НАЗАД В МЕНЮ" СКРЫТА
-        self.ui.pb_back.hide()
-
         # Иконка кнопки "Назад в меню"
         global is_dark_mode
         if is_dark_mode:
@@ -382,17 +380,31 @@ class Training(QWidget):
         else:
             i_back = QIcon(QPixmap(":/icons/back.png"))
             self.ui.pb_back.setIcon(i_back)
+            i_end_training = QIcon(QPixmap(":/icons/end_training.png"))
+            self.ui.pb_end_training.setIcon(i_end_training)
+            i_hard_word = QIcon(QPixmap(":/icons/hard_word.png"))
+            self.ui.pb_hard_word.setIcon(i_hard_word)
+            i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
+            self.ui.pb_delete_word.setIcon(i_delete_word)
+
+        # ВРЕМЕННОЕ СКРЫТИЕ КНОПОК
+        self.ui.pb_end_training.hide()
+        self.ui.pb_delete_word.hide()
+        self.ui.pb_hard_word.hide()
 
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
         self.ui.progressBar.setObjectName("training-prb")
-        self.ui.pb_next.setObjectName("context-button")
+        self.ui.pb_delete_word.setObjectName("training-context-button")
+        self.ui.pb_back.setObjectName("training-context-button")
+        self.ui.pb_hard_word.setObjectName("training-context-button")
+        self.ui.pb_end_training.setObjectName("training-context-button")
         self.ui.l_example.setObjectName("example")
         self.ui.pb_next.setObjectName("next")
-        self.ui.pb_back.setObjectName("training-context-button")
 
-        # Функционал кнопки "далее"
+        # Функционал кнопок
         self.ui.pb_next.clicked.connect(self.next_question)
+        self.ui.pb_back.clicked.connect(self.return_to_menu)
 
         self.a_word = ""  # Для текущего слова
         self.answer = 0  # Номер гласной-ответа
@@ -405,23 +417,28 @@ class Training(QWidget):
         self.word_progress = []  # Для хранения прогресса слов на повторении
 
         global questions_amount, is_repeat, repeats_amount, bad_words
-        # Настрока прогресс-бара
+        # Настройка прогресс-бара
         self.ui.progressBar.setMaximum(questions_amount)
         self.ui.progressBar.setValue(self.current_question)
 
-        # Определение параметров, если класс был запущен в режиме повторения
+        # ОПРЕДЕЛЕНИЕ ПАРАМЕТРОВ, ЕСЛИ КЛАСС БЫЛ ЗАПУЩЕН В РЕЖИМЕ ПОВТОРЕНИЯ
         if is_repeat:
             # Определение прогресса для каждого слова для повторения
             self.word_progress = [repeats_amount] * len(bad_words)
             self.whole_progress_value = 0
 
             # Определение максимального значения для прогресс-бара
-            pbm = 0
+            pbm = 0  # pbm - Progress Bar M... я не помню что значит 'm'. Впрочем, это не важно.
             for v in self.word_progress:
                 pbm += v
                 self.whole_progress_value = pbm
             self.ui.progressBar.setMaximum(pbm)
             self.ui.progressBar.setValue(1)
+
+            self.ui.l_stats.hide()  # Скрываю текст со статистикой.
+            self.ui.pb_end_training.setDisabled(True)
+            self.ui.pb_hard_word.setDisabled(True)
+            self.ui.pb_delete_word.setDisabled(True)
 
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
 
@@ -446,6 +463,8 @@ class Training(QWidget):
 
         # Скрываем кнопку "далее"
         self.ui.pb_next.hide()
+
+        self.update_stats()
 
         selected_word = None  # Для хранения выбранного слова
         if not is_repeat:
@@ -533,7 +552,7 @@ class Training(QWidget):
         """Вызывается, когда включён режим повторения. Возвращает ID вопросного слова из списка с ошибками проходясь
 по ним по очереди."""
 
-        global bad_words
+        global bad_words, is_mix_words
 
         # Если все слова повторены - собираемся выходить из повторения
         if self.word_progress.count(0) == len(self.word_progress):
@@ -542,8 +561,12 @@ class Training(QWidget):
 
         # Ищем слово, которое ещё нужно повторить
         while True:
-            # Смотрим следующее слово...
-            self.current_repeat_w += 1
+            if is_mix_words:
+                # Если включена опция - вытаскиваем случайное слово
+                self.current_repeat_w = random.randint(0, len(bad_words))
+            else:
+                # Иначе, смотрим слова по порядку...
+                self.current_repeat_w += 1
             # ...и проверяем, чтобы мы не вышли за границы дозволенного
             if self.current_repeat_w >= len(bad_words):
                 self.current_repeat_w = 0
@@ -561,15 +584,6 @@ class Training(QWidget):
         self.ui.pb_next.setText("Вернуться в меню")
         self.ui.pb_next.show()
 
-    @Slot()
-    def return_to_menu(self):
-        """Возвращение в главное меню"""
-        global main_window
-        clear_globals()
-        main_window = MainWindow()
-        main_window.show()
-        self.close()
-
     def change_progress(self):
         """Меняет значение в Progress Bar."""
         global is_repeat
@@ -585,6 +599,22 @@ class Training(QWidget):
             for v in self.word_progress:
                 pbm += v
             self.ui.progressBar.setValue(self.whole_progress_value - pbm + 1)
+
+    def update_stats(self):
+        """Обновление текста со статистикой."""
+        global questions_amount, bad_words, score
+        incorrect_amount = len(bad_words)
+        whole_amount = questions_amount - len(self.completed_words)
+        correct_amount = score
+        the_text = "<span style='font-weight: bold;'>" + \
+                   "<span style='color: red;'>" + \
+                   str(incorrect_amount) + \
+                   "</span>" + \
+                   "    |   " + str(whole_amount) + \
+                   "    |   <span style='color: green;'>" + str(correct_amount) + \
+                   "</span>" + \
+                   "</span>"
+        self.ui.l_stats.setText(the_text)
 
     def show_buttons(self):
         """Показывает кнопки в зависимости от количества букв в текущем слове."""
@@ -627,6 +657,15 @@ class Training(QWidget):
                 button.clicked.disconnect(self.incorrect)
 
             x += 1
+
+    @Slot()
+    def return_to_menu(self):
+        """Возвращение в главное меню"""
+        global main_window
+        clear_globals()
+        main_window = MainWindow()
+        main_window.show()
+        self.close()
 
     @Slot()
     def next_question(self):
@@ -714,7 +753,8 @@ class Training(QWidget):
     def incorrect(self):
         """Вызывается, если на вопрос был дан неверный ответ."""
 
-        global next_question_delay, bad_words, is_auto_next, is_repeat
+        global next_question_delay, bad_words, is_auto_next, is_repeat, is_reset_progress, repeats_amount, \
+            is_smart_offer
 
         # Отключение происходит сразу же, чтобы пользователь больше не нажимал
         # на кнопки с последствиями
@@ -723,6 +763,13 @@ class Training(QWidget):
         # НЕ в режиме повторения добавляем ошибочное слово в список для дальнейшего повторения
         if not is_repeat:
             bad_words.append(self.current_word)
+
+            # if is_smart_offer:
+            #     self.smart_add()
+        # В режиме повторения, если включена опция, сбрасываем прогресс для слова,
+        # если ответ на него неверен
+        elif is_repeat and is_reset_progress:
+            self.word_progress[self.current_repeat_w] = repeats_amount
 
         # Меняем стиль виджетов
         self.ui.l_header.setText("Неправильно!")
@@ -747,81 +794,90 @@ class Training(QWidget):
         else:
             self.ui.pb_next.show()
 
-    @staticmethod
-    def define_word(line):
+    # def smart_add(self):
+    #
+    #     if not os.path.isfile("hard_words.txt"):
+    #         with open("hard_words.txt", "w") as file:
+    #             pass
+    #
+    #     with open("hard_words.txt", "a") as file:
+    #         file.write("\n" + self.a_word + ":1")
+
+    def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""
 
-        file = open("words.txt")
+        check_words_existence(self)
 
-        the_word = None
-        x = 1
-        while x <= line:
-            the_word = file.readline()
-            x += 1
+        with open("words.txt") as file:
+            the_word = None
+            x = 1
+            while x <= line:
+                the_word = file.readline()
+                x += 1
 
-        file.close()
-        return the_word
+            return the_word
 
     def define_random_word(self):
         """Определяет и возвращает случайный номер слова для вопроса, если его ещё не было."""
 
-        file = open("words.txt", "r")
+        check_words_existence(self)
 
-        # Узнаём количество строк в words.txt
-        amount_of_lines = len(file.readlines())
-        while True:
-            # Генерируем число, которое равносильно номеру строки в файле words.txt
-            a_number = random.randint(1, amount_of_lines)
-            if a_number not in self.completed_words:
-                self.completed_words.append(a_number)
-                break
+        with open("words.txt", "r") as file:
 
-        file.close()
+            # Узнаём количество строк в words.txt
+            amount_of_lines = len(file.readlines())
+            while True:
+                # Генерируем число, которое равносильно номеру строки в файле words.txt
+                a_number = random.randint(1, amount_of_lines)
+                if a_number not in self.completed_words:
+                    self.completed_words.append(a_number)
+                    break
 
         return a_number
 
-    @staticmethod
-    def define_answer(number):
-        """Ищет в answer.txt ответ на вопрос и возвращает его."""
+    def define_answer(self, number):
+        """Ищет в answers ответ на вопрос и возвращает его."""
 
-        t = open("answers")
-        the_answer = None
-        x = 1
-        # Пока не дошли до ответа для загаданного слова...
-        while x <= number:
-            # Читаем строки и увеличиваем счётчик
-            the_answer = t.readline()
-            x += 1
+        # Если был удалён файл answers
+        if not os.path.isfile("answers"):
+            find_answers(self)
 
-        # Отрезаем перевод строки
-        the_answer = the_answer.rstrip("\n")
+        with open("answers") as file:
+            the_answer = None
+            x = 1
+            # Пока не дошли до ответа для загаданного слова...
+            while x <= number:
+                # Читаем строки и увеличиваем счётчик
+                the_answer = file.readline()
+                x += 1
 
-        # Переменная отвечает за то, множественный ли ответ для слова или нет
-        is_multiple_answer = False
-        # Определяем, множественный ли ответ, по наличию "/" в нём
-        for y in the_answer:
-            if y == "/":
-                is_multiple_answer = True
-                break
+            # Отрезаем перевод строки
+            the_answer = the_answer.rstrip("\n")
 
-        # Если ответ множественный...
-        if is_multiple_answer:
-            # Ищем все числа-ответы, перебирая строку с ответом исключая "/"
-            the_multiple_answer = []
+            # Переменная отвечает за то, множественный ли ответ для слова или нет
+            is_multiple_answer = False
+            # Определяем, множественный ли ответ, по наличию "/" в нём
             for y in the_answer:
-                if y != "/":
-                    # Записываем возможные ответы в переменную-список в типе int
-                    the_multiple_answer.append(int(y))
-            t.close()
-            # Возвращаем список с ответами
-            return the_multiple_answer
-        # Если ответ является единичным, то делаем его списком
-        else:
-            the_answer = int(the_answer)
-            the_answer = [the_answer]
-            t.close()
-            # Возвращаем единичный ответ в виде списка
-            return the_answer
+                if y == "/":
+                    is_multiple_answer = True
+                    break
+
+            # Если ответ множественный...
+            if is_multiple_answer:
+                # Ищем все числа-ответы, перебирая строку с ответом исключая "/"
+                the_multiple_answer = []
+                for y in the_answer:
+                    if y != "/":
+                        # Записываем возможные ответы в переменную-список в типе int
+                        the_multiple_answer.append(int(y))
+                # Возвращаем список с ответами
+                return the_multiple_answer
+            # Если ответ является единичным, то делаем его списком
+            else:
+                the_answer = int(the_answer)
+                the_answer = [the_answer]
+                # Возвращаем единичный ответ в виде списка
+                return the_answer
 
 
 class Results(QWidget):
@@ -868,11 +924,12 @@ class Results(QWidget):
     def again(self):
         """Начать тренировку заново."""
         global training_window
+        self.clear()
         training_window = None
         training_window = Training()
         training_window.show()
         self.close()
-        self.clear()
+        # training_window.update_stats()
 
     @Slot()
     def menu(self):
@@ -924,7 +981,7 @@ class Results(QWidget):
         # Ответили на 99%-75% вопросов
         elif first_grade > score >= second_grade:
             self.ui.l_comment.setText("Вы весьма неплохо справляетесь! В следующий раз у вас получится \
-набрать 100%.")
+ответить на все вопросы!")
 
         # Ответили на 74%-50%
         elif second_grade > score >= third_grade:
@@ -953,33 +1010,107 @@ class LetterButton(QPushButton):
         self.isAnswer = False
 
 
+def find_answers(calling_window):
+    """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
+Просматривает файл words.txt и на основе заглавных букв в словах составляет
+файл с ответами - answers."""
+
+    check_words_existence(calling_window)
+
+    ans = open("answers", "w")
+    file = open("words.txt")
+
+    while True:
+        # Читаем строку в файле
+        a_line = file.readline()
+        # Отрезаем окончание
+        a_line = a_line.rstrip("\n")
+
+        # Прерываем цикл, если встречается пустая строка - это значит весь файл уже прочитан
+        if not a_line:
+            break
+
+        # Иначе исследуем каждый символ в прочитанной строке, ведь строка - это одно слово.
+        amount_of_vowels = 0
+        # Переменная отвечает за то, была ли уже найдена заглавная буква или ещё нет
+        found_percussive_vowel = False
+
+        for x in a_line:
+            # Если это строчная гласная, то просто увеличиваем количество гласных для этого слова.
+            if x in lower_vowels:
+                amount_of_vowels += 1
+
+            # Если заглавная (ударная) гласная, то не только увеличиваем их количество, но
+            # и записываем эту гласную как ответ к слову в файл answers,
+            # а если есть и другие ударные гласные, то через "/" записываем и их
+            elif x in upper_vowels:
+                amount_of_vowels += 1
+                if not found_percussive_vowel:
+                    found_percussive_vowel = True
+                    ans.write(str(amount_of_vowels))
+                elif found_percussive_vowel:
+                    ans.write("/")
+                    ans.write(str(amount_of_vowels))
+
+        ans.write("\n")  # Перевод строки после записи ответа для слова
+
+    file.close()
+    ans.close()
+
+
 def check_settings_existence():
     """Проверяет наличие settings.ini и если не обнаруживает файл, то создаёт его."""
+
     if not os.path.isfile("settings.ini"):
-        filler = "default=10\nrepeat_amount=3\nauto_next=1\nauto_time=1000\n"
-        file = open("settings.ini", "w")
-        file.write(filler)
-        file.close()
+        filler = "default=10\nrepeat_amount=3\nis_reset_progress=0\nis_mix_words=0\nis_smart_offer=1\n" + \
+                 "triggering_threshold=2\nauto_next=1\nauto_time=1000\n"
+        with open("settings.ini", "w") as file:
+            file.write(filler)
+
+
+def check_words_existence(calling_window):
+    """Если не был обнаружен words.txt, то создаём его и заполняем несколькими
+словами и сообщаем о ненахождении."""
+
+    if not os.path.isfile("words.txt"):
+        QMessageBox.question(calling_window, "Внимание!", "Файл \"words.txt\" не был обнаружен в директории с исполняемым\
+                                                              файлом. Он будет создан и заполнен несколькими словами. \
+                                                              Пожалуйста, поместите исходный файл \"words.txt\" или \
+                                                              настройте его самостоятельно в соответствии с инструкцией в \
+                                                              \"README.txt\".",
+                             QMessageBox.Ok)
+
+        filler = "бАнты\nтОрты\nшАрфы\nпОрты\nсрЕдства\nИксы\nкрАны\nкОнусы\nлЕкторы\nпОручни"
+
+        with open("words.txt", "w") as file:
+            file.write(filler)
 
 
 def extract_settings():
     """Сохраняет значения из файла настроек в соответствующие глобальные переменные."""
-    global default_amount, next_question_delay, repeats_amount, is_auto_next
+    global default_amount, next_question_delay, repeats_amount, is_auto_next, \
+        is_reset_progress, is_mix_words, is_smart_offer, triggering_threshold
 
     check_settings_existence()
-    file = open("settings.ini")
+    with open("settings.ini") as file:
 
-    for param in file.readlines():
-        if "default=" in param:
-            default_amount = int(param.lstrip("default="))
-        elif "repeat_amount=" in param:
-            repeats_amount = int(param.lstrip("repeat_amount="))
-        elif "auto_next=" in param:
-            is_auto_next = bool(int(param.lstrip("auto_next=")))
-        elif "auto_time=" in param:
-            next_question_delay = int(param.lstrip("auto_time="))
-
-    file.close()
+        for param in file.readlines():
+            if "default=" in param:
+                default_amount = int(param.lstrip("default="))
+            elif "repeat_amount=" in param:
+                repeats_amount = int(param.lstrip("repeat_amount="))
+            elif "auto_next=" in param:
+                is_auto_next = bool(int(param.lstrip("auto_next=")))
+            elif "auto_time=" in param:
+                next_question_delay = int(param.lstrip("auto_time="))
+            elif "is_reset_progress=" in param:
+                is_reset_progress = bool(int(param.lstrip("is_reset_progress=")))
+            elif "is_mix_words=" in param:
+                is_mix_words = bool(int(param.lstrip("is_mix_words=")))
+            elif "is_smart_offer=" in param:
+                is_smart_offer = bool(int(param.lstrip("is_smart_offer=")))
+            elif "triggering_threshold=" in param:
+                triggering_threshold = int(param.lstrip("triggering_threshold="))
 
 
 def clear_globals():
