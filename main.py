@@ -14,9 +14,6 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
-# TODO: не обновляется значение статистики при "Ещё раз".
-# TODO: Скрытие кнопки "повторение", если были ошибки в словах
-
 # Служебные переменные --------------------------------------------------------
 
 lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
@@ -272,6 +269,12 @@ class Settings(QWidget):
         self.ui.pb_save.setObjectName("context-button")
         self.ui.pb_cancel.setObjectName("context-button")
 
+        # ВРЕМЕННОЕ СКРЫТИЕ ПУНКТА "УМНОЕ ПРЕДЛОЖЕНИЕ"
+        self.ui.l_8.hide()
+        self.ui.cb_3.hide()
+        self.ui.l_10.hide()
+        self.ui.sb_4.hide()
+
         # Иконка приложения
         i_app = QIcon(QPixmap(":/icon.ico"))
         self.setWindowIcon(i_app)
@@ -437,8 +440,6 @@ class Training(QWidget):
             self.ui.pb_hard_word.setDisabled(True)
             self.ui.pb_delete_word.setDisabled(True)
 
-        self.update_stats()  # Обновляем статистику (на всякий случай (когда я говорю "на всякий случай"
-        # это значит, что наличию этой строки есть объяснение и её нельзя убирать.))
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
 
     def question(self):
@@ -763,8 +764,8 @@ class Training(QWidget):
         if not is_repeat:
             bad_words.append(self.current_word)
 
-            if is_smart_offer:
-                self.smart_add()
+            # if is_smart_offer:
+            #     self.smart_add()
         # В режиме повторения, если включена опция, сбрасываем прогресс для слова,
         # если ответ на него неверен
         elif is_repeat and is_reset_progress:
@@ -793,14 +794,14 @@ class Training(QWidget):
         else:
             self.ui.pb_next.show()
 
-    def smart_add(self):
-
-        if not os.path.isfile("hard_words.txt"):
-            with open("hard_words.txt", "w") as file:
-                pass
-
-        with open("hard_words.txt", "a") as file:
-            file.write("\n" + self.a_word + ":1")
+    # def smart_add(self):
+    #
+    #     if not os.path.isfile("hard_words.txt"):
+    #         with open("hard_words.txt", "w") as file:
+    #             pass
+    #
+    #     with open("hard_words.txt", "a") as file:
+    #         file.write("\n" + self.a_word + ":1")
 
     def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""
@@ -923,11 +924,12 @@ class Results(QWidget):
     def again(self):
         """Начать тренировку заново."""
         global training_window
+        self.clear()
         training_window = None
         training_window = Training()
         training_window.show()
         self.close()
-        self.clear()
+        # training_window.update_stats()
 
     @Slot()
     def menu(self):

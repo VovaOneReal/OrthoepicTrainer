@@ -64,7 +64,7 @@ class Ui_About(object):
         About.setWindowTitle(QCoreApplication.translate("About", u"\u041e\u0431 \u0430\u0432\u0442\u043e\u0440\u0435", None))
         self.l_author.setText(QCoreApplication.translate("About", u"<html><head/><body><p align=\"center\">\u0420\u0430\u0437\u0440\u0430\u0431\u043e\u0442\u0447\u0438\u043a<br/>Vladimir T. (VovaOne)</p></body></html>", None))
         self.l_link.setText(QCoreApplication.translate("About", u"<html><head/><body><p><a href=\"https://github.com/VovaOneReal/OrthoepicTrainer\"><span style=\" text-decoration: underline; color:#0000ff;\">\u041f\u0440\u043e\u0435\u043a\u0442 \u043d\u0430 GitHub</span></a></p></body></html>", None))
-        self.l_version.setText(QCoreApplication.translate("About", u"v.2.2 (\u043e\u0442 xx.05.21) \u00a9 2021 \u0433.", None))
+        self.l_version.setText(QCoreApplication.translate("About", u"v.2.2 (\u043e\u0442 13.05.21) \u00a9 2021 \u0433.", None))
         self.pb_changelog.setText(QCoreApplication.translate("About", u"\u0421\u043f\u0438\u0441\u043e\u043a \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439", None))
     # retranslateUi
 

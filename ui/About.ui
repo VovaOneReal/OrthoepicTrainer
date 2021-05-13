@@ -90,7 +90,7 @@
     </font>
    </property>
    <property name="text">
-    <string>v.2.2 (от xx.05.21) © 2021 г.</string>
+    <string>v.2.2 (от 13.05.21) © 2021 г.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
