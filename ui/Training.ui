@@ -123,8 +123,8 @@
   <widget class="QPushButton" name="pb_back">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>25</y>
+     <x>310</x>
+     <y>90</y>
      <width>31</width>
      <height>31</height>
     </rect>
@@ -192,6 +192,12 @@
       </colorrole>
      </disabled>
     </palette>
+   </property>
+   <property name="toolTip">
+    <string>Назад</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
    </property>
    <property name="text">
     <string/>
@@ -302,6 +308,12 @@
      </disabled>
     </palette>
    </property>
+   <property name="toolTip">
+    <string>Определить предыдущее слово как неверное</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -389,6 +401,12 @@
      </disabled>
     </palette>
    </property>
+   <property name="toolTip">
+    <string>Завершить тренировку</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -411,6 +429,12 @@
      <width>31</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Добавить слово в список нетренеруемых</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
    </property>
    <property name="text">
     <string/>

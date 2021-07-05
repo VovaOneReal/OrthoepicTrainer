@@ -14,6 +14,9 @@ from ui.Training import Ui_Training
 
 import materials.resources
 
+# TODO: по какой-то причине провал отсоединения роли кнопки "далее" в окне повторения, после окончания оного
+# TODO: неверное отображение верных ответов в окре результатов даже после нажатия "определить предыдущее слово..."
+
 # Служебные переменные --------------------------------------------------------
 
 lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
@@ -387,11 +390,6 @@ class Training(QWidget):
             i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
             self.ui.pb_delete_word.setIcon(i_delete_word)
 
-        # ВРЕМЕННОЕ СКРЫТИЕ КНОПОК
-        self.ui.pb_end_training.hide()
-        self.ui.pb_delete_word.hide()
-        self.ui.pb_hard_word.hide()
-
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
         self.ui.progressBar.setObjectName("training-prb")
@@ -405,10 +403,13 @@ class Training(QWidget):
         # Функционал кнопок
         self.ui.pb_next.clicked.connect(self.next_question)
         self.ui.pb_back.clicked.connect(self.return_to_menu)
+        self.ui.pb_end_training.clicked.connect(self.show_results)
+        self.ui.pb_hard_word.clicked.connect(self.make_wrong)
 
         self.a_word = ""  # Для текущего слова
         self.answer = 0  # Номер гласной-ответа
         self.current_word = 0  # Порядковый номер текущего слова
+        self.last_word_id = self.current_word  # Порядковый номер предыдущего слова
         self.current_question = 1  # Для номера текущего вопроса
         self.current_repeat_w = -1  # Для номера повторяемого слова
         self.is_repeat_over = False  # Окончено ли повторение?
@@ -470,6 +471,7 @@ class Training(QWidget):
         if not is_repeat:
             # Выбираем случайное слово и оформляем его
             selected_word = self.define_random_word()
+            self.last_word_id = self.current_word
             self.current_word = selected_word
             self.a_word = self.define_word(selected_word)
         else:
@@ -684,9 +686,7 @@ class Training(QWidget):
                 self.show_buttons()  # Показываем кнопки
             # Если ответили, то показываем окно результатов
             else:
-                self.results = Results()
-                self.results.show()
-                self.close()
+                self.show_results()
         # В режиме повторения, если он ещё не закончен, действуем почти аналогично
         else:
             if not self.is_repeat_over:
@@ -764,8 +764,8 @@ class Training(QWidget):
         if not is_repeat:
             bad_words.append(self.current_word)
 
-            # if is_smart_offer:
-            #     self.smart_add()
+            if is_smart_offer:
+                self.smart_add()
         # В режиме повторения, если включена опция, сбрасываем прогресс для слова,
         # если ответ на него неверен
         elif is_repeat and is_reset_progress:
@@ -794,14 +794,62 @@ class Training(QWidget):
         else:
             self.ui.pb_next.show()
 
-    # def smart_add(self):
-    #
-    #     if not os.path.isfile("hard_words.txt"):
-    #         with open("hard_words.txt", "w") as file:
-    #             pass
-    #
-    #     with open("hard_words.txt", "a") as file:
-    #         file.write("\n" + self.a_word + ":1")
+    def blacklisting(self):
+        """Реализация кнопки 'никогда не тренировать слово'."""
+
+        pass
+
+    def make_wrong(self):
+        """Реализация кнопки 'отметить предыдущее слово как неверное'."""
+
+        global bad_words
+        if self.last_word_id not in bad_words:
+            bad_words.append(self.last_word_id)
+            self.update_stats()
+
+    def show_results(self):
+        """Демонстрация окна с результатами."""
+        self.results = Results()
+        self.results.show()
+        self.close()
+
+    def smart_add(self):
+        """Работа с умным предложением слов."""
+
+        if not os.path.isfile("hard_words.txt"):
+            with open("hard_words.txt", "w") as file:
+                pass
+
+        # СОХРАНЯЕМ ТЕКУЩЕЕ СОДЕРЖАНИЕ ФАЙЛА
+        with open("hard_words.txt") as file:
+            file_backup = file.readlines()
+            print(file_backup)
+
+        # ПРОВЕРЯЕМ НАЛИЧИЕ СЛОВА В ФАЙЛЕ
+        target = self.a_word
+        print("Target", target)
+        line = 1
+        while line <= len(file_backup):
+            print("Line:", line)
+
+            # Оформляем текущее слово в файле для обработки
+            destination = ""
+            raw_destination = file_backup[line-1]
+            for letter in raw_destination:
+                if letter == ":":
+                    print("Destination:", destination)
+                    break
+                else:
+                    destination += letter
+
+            if target == destination:
+                print("Слово уже есть в файле!")
+                break
+            else:
+                line += 1
+        else:
+            with open("hard_words.txt", "a") as file:
+                file.write(self.a_word + ": 1\n")
 
     def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""
@@ -909,9 +957,9 @@ class Results(QWidget):
         self.ui.pb_cont.clicked.connect(self.repeat)
 
         # Скрытие кнопки "повторение", если были ошибки в словах
-        # global bad_words
-        # if len(bad_words) == 0:
-        #     self.ui.pb_cont.hide()
+        global bad_words
+        if len(bad_words) <= 0:
+            self.ui.pb_cont.hide()
 
         self.results()
 
