@@ -235,7 +235,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="pb_hard_word">
+  <widget class="QPushButton" name="pb_make_wrong">
    <property name="geometry">
     <rect>
      <x>410</x>

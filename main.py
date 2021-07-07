@@ -15,7 +15,9 @@ from ui.Training import Ui_Training
 import materials.resources
 
 # TODO: по какой-то причине провал отсоединения роли кнопки "далее" в окне повторения, после окончания оного
-# TODO: неверное отображение верных ответов в окре результатов даже после нажатия "определить предыдущее слово..."
+# TODO: неверное отображение статистики ответов после нажатия "определить предыдущее слово..."
+# Todo: Проверить правильность отображения результатов в окре результатов.
+# Todo: в идеале такие списки как bad_words должны быть множествами. Может быть это поможет упростить код.
 
 # Служебные переменные --------------------------------------------------------
 
@@ -23,7 +25,6 @@ lower_vowels = ("а", "у", "о", "и", "э", "ы", "я", "ю", "е", "ё")
 upper_vowels = ("А", "У", "О", "И", "Э", "Ы", "Я", "Ю", "Е", "Ё")
 
 questions_amount = 0  # Количество вопросов для тренировки
-score = 0  # Подсчёт очков для результата
 bad_words = []  # Запись ID слов, в которых была допущена ошибка
 is_repeat = False  # Режим повтора
 
@@ -386,7 +387,7 @@ class Training(QWidget):
             i_end_training = QIcon(QPixmap(":/icons/end_training.png"))
             self.ui.pb_end_training.setIcon(i_end_training)
             i_hard_word = QIcon(QPixmap(":/icons/hard_word.png"))
-            self.ui.pb_hard_word.setIcon(i_hard_word)
+            self.ui.pb_make_wrong.setIcon(i_hard_word)
             i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
             self.ui.pb_delete_word.setIcon(i_delete_word)
 
@@ -395,7 +396,7 @@ class Training(QWidget):
         self.ui.progressBar.setObjectName("training-prb")
         self.ui.pb_delete_word.setObjectName("training-context-button")
         self.ui.pb_back.setObjectName("training-context-button")
-        self.ui.pb_hard_word.setObjectName("training-context-button")
+        self.ui.pb_make_wrong.setObjectName("training-context-button")
         self.ui.pb_end_training.setObjectName("training-context-button")
         self.ui.l_example.setObjectName("example")
         self.ui.pb_next.setObjectName("next")
@@ -404,7 +405,7 @@ class Training(QWidget):
         self.ui.pb_next.clicked.connect(self.next_question)
         self.ui.pb_back.clicked.connect(self.return_to_menu)
         self.ui.pb_end_training.clicked.connect(self.show_results)
-        self.ui.pb_hard_word.clicked.connect(self.make_wrong)
+        self.ui.pb_make_wrong.clicked.connect(self.make_wrong)
 
         self.a_word = ""  # Для текущего слова
         self.answer = 0  # Номер гласной-ответа
@@ -438,7 +439,7 @@ class Training(QWidget):
 
             self.ui.l_stats.hide()  # Скрываю текст со статистикой.
             self.ui.pb_end_training.setDisabled(True)
-            self.ui.pb_hard_word.setDisabled(True)
+            self.ui.pb_make_wrong.setDisabled(True)
             self.ui.pb_delete_word.setDisabled(True)
 
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
@@ -466,6 +467,14 @@ class Training(QWidget):
         self.ui.pb_next.hide()
 
         self.update_stats()
+
+        # Если это первое слово - на кнопку "Определить пр. слово" нажать нельзя.
+        if len(self.completed_words) <= 0:
+            self.ui.pb_make_wrong.setDisabled(True)
+        else:
+            self.ui.pb_make_wrong.setDisabled(False)
+
+        # -------------------------------------------------------------------
 
         selected_word = None  # Для хранения выбранного слова
         if not is_repeat:
@@ -604,10 +613,12 @@ class Training(QWidget):
 
     def update_stats(self):
         """Обновление текста со статистикой."""
-        global questions_amount, bad_words, score
+        global questions_amount, bad_words
+
         incorrect_amount = len(bad_words)
         whole_amount = questions_amount - len(self.completed_words)
-        correct_amount = score
+        correct_amount = len(self.completed_words) - len(bad_words)
+
         the_text = "<span style='font-weight: bold;'>" + \
                    "<span style='color: red;'>" + \
                    str(incorrect_amount) + \
@@ -616,6 +627,7 @@ class Training(QWidget):
                    "    |   <span style='color: green;'>" + str(correct_amount) + \
                    "</span>" + \
                    "</span>"
+
         self.ui.l_stats.setText(the_text)
 
     def show_buttons(self):
@@ -718,8 +730,7 @@ class Training(QWidget):
         # на кнопки с последствиями
         self.disable_buttons()
 
-        global score, next_question_delay, is_auto_next, is_repeat
-        score += 1  # Увеличиваем счёт для дальнейшего вывода результатов
+        global next_question_delay, is_auto_next, is_repeat
 
         # Меняем стиль виджетов
         self.ui.l_header.setText("Правильно!")
@@ -794,19 +805,21 @@ class Training(QWidget):
         else:
             self.ui.pb_next.show()
 
+    @Slot()
     def blacklisting(self):
         """Реализация кнопки 'никогда не тренировать слово'."""
 
         pass
 
+    @Slot()
     def make_wrong(self):
-        """Реализация кнопки 'отметить предыдущее слово как неверное'."""
-
+        """Реализация кнопки "отметить предыдущее слово как неверное"."""
         global bad_words
         if self.last_word_id not in bad_words:
             bad_words.append(self.last_word_id)
             self.update_stats()
 
+    @Slot()
     def show_results(self):
         """Демонстрация окна с результатами."""
         self.results = Results()
@@ -991,25 +1004,23 @@ class Results(QWidget):
     @Slot()
     def repeat(self):
         """Включение режима повторения."""
-        global is_repeat, training_window, score
+        global is_repeat, training_window
         is_repeat = True
         training_window = None
         training_window = Training()
         training_window.show()
         self.close()
-        score = 0
 
     @staticmethod
     def clear():
         """Очистка некоторых глобальных переменных."""
-        global score, bad_words
-        score = 0
+        global bad_words
         bad_words = []
 
     def results(self):
         """Отображает результат тренировки и даёт соответствующий комментарий."""
 
-        global score, questions_amount
+        global questions_amount, bad_words
 
         one_percent = questions_amount / 100  # Определили один процент от общего числа вопросов
 
@@ -1018,6 +1029,8 @@ class Results(QWidget):
         third_grade = one_percent * 50  # Ответили на 50% вопросов
         fourth_grade = one_percent * 25  # Ответили на 25% вопросов
         fifth_grade = 0  # Не ответили ни на один вопрос
+
+        score = questions_amount - len(bad_words)
 
         grade_text = str(score) + " правильных ответов из " + str(questions_amount)  # + "."
         self.ui.l_grade.setText(grade_text)
@@ -1164,11 +1177,10 @@ def extract_settings():
 def clear_globals():
     """Очищает глобальные переменные, приводя их к значениям по умолчанию (исключая глобальные переменные)."""
 
-    global main_window, training_window, questions_amount, score, bad_words, is_repeat
+    global main_window, training_window, questions_amount, bad_words, is_repeat
     main_window = None
     training_window = None
     questions_amount = 0
-    score = 0
     bad_words = []
     is_repeat = False
 
