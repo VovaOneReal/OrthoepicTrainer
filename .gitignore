@@ -254,4 +254,5 @@ build.bat
 /words.txt.bak
 settings.ini
 *.bak
+blacklist.txt
 hard_words.txt

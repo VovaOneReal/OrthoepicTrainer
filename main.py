@@ -36,7 +36,7 @@ repeats_amount = 3
 is_reset_progress = False
 is_mix_words = False
 is_smart_offer = True
-triggering_threshold = 2
+# triggering_threshold = 2
 is_auto_next = True
 next_question_delay = 1000
 
@@ -388,12 +388,12 @@ class Training(QWidget):
             i_hard_word = QIcon(QPixmap(":/icons/hard_word.png"))
             self.ui.pb_make_wrong.setIcon(i_hard_word)
             i_delete_word = QIcon(QPixmap(":/icons/delete_word.png"))
-            self.ui.pb_delete_word.setIcon(i_delete_word)
+            self.ui.pb_blacklisting.setIcon(i_delete_word)
 
         # Для стилей
         self.ui.l_header.setObjectName("training-header")
         self.ui.progressBar.setObjectName("training-prb")
-        self.ui.pb_delete_word.setObjectName("training-context-button")
+        self.ui.pb_blacklisting.setObjectName("training-context-button")
         self.ui.pb_back.setObjectName("training-context-button")
         self.ui.pb_make_wrong.setObjectName("training-context-button")
         self.ui.pb_end_training.setObjectName("training-context-button")
@@ -405,7 +405,9 @@ class Training(QWidget):
         self.ui.pb_back.clicked.connect(self.return_to_menu)
         self.ui.pb_end_training.clicked.connect(self.show_results)
         self.ui.pb_make_wrong.clicked.connect(self.make_wrong)
+        self.ui.pb_blacklisting.clicked.connect(self.blacklisting)
 
+        # Переменные
         self.a_word = ""  # Для текущего слова
         self.answer = 0  # Номер гласной-ответа
         self.current_word = 0  # Порядковый номер текущего слова
@@ -439,7 +441,7 @@ class Training(QWidget):
             self.ui.l_stats.hide()  # Скрываю текст со статистикой.
             self.ui.pb_end_training.setDisabled(True)
             self.ui.pb_make_wrong.setDisabled(True)
-            self.ui.pb_delete_word.setDisabled(True)
+            self.ui.pb_blacklisting.setDisabled(True)
 
         self.question()  # Задаём первый вопрос / эта строка должна быть последней.
 
@@ -477,15 +479,21 @@ class Training(QWidget):
         if not is_repeat:
             # Выбираем случайное слово и оформляем его
             selected_word = self.define_random_word()
+
             self.last_word_id = self.current_word
             self.current_word = selected_word
+
             self.a_word = self.define_word(selected_word)
+
+            # while is_id_in_blacklist(self.a_word)
+
             self.update_stats()
         else:
             self.repeat()
             # Если повторение закончено, то закругляемся
             if self.is_repeat_over:
                 self.clear_buttons()
+                self.disable_buttons()
                 self.ui.l_example.setText("")
                 self.end_repeat()
                 return 0
@@ -656,7 +664,7 @@ class Training(QWidget):
 
             x += 1
 
-    def disable_buttons(self):
+    def designalize_buttons(self):
         """Отключает сигналы от всех кнопок."""
         button_amount = self.ui.lo_training.count()
 
@@ -670,14 +678,12 @@ class Training(QWidget):
 
             x += 1
 
-    @Slot()
-    def return_to_menu(self):
-        """Возвращение в главное меню"""
-        global main_window
-        clear_globals()
-        main_window = MainWindow()
-        main_window.show()
-        self.close()
+    def disable_buttons(self):
+        """Делает кнопки неактивными. Используется только по окончании повторения."""
+        x = 0
+        while x < self.ui.lo_training.count():
+            self.ui.lo_training.itemAt(x).widget().setDisabled(True)
+            x += 1
 
     @Slot()
     def next_question(self):
@@ -726,9 +732,9 @@ class Training(QWidget):
 
         # Отключение происходит сразу же, чтобы пользователь больше не нажимал
         # на кнопки с последствиями
-        self.disable_buttons()
+        self.designalize_buttons()
 
-        global next_question_delay, is_auto_next, is_repeat,score
+        global next_question_delay, is_auto_next, is_repeat, score
 
         # Меняем стиль виджетов
         self.ui.l_header.setText("Правильно!")
@@ -770,7 +776,7 @@ class Training(QWidget):
 
         # Отключение происходит сразу же, чтобы пользователь больше не нажимал
         # на кнопки с последствиями
-        self.disable_buttons()
+        self.designalize_buttons()
 
         # НЕ в режиме повторения добавляем ошибочное слово в список для дальнейшего повторения
         if not is_repeat:
@@ -809,10 +815,13 @@ class Training(QWidget):
             self.ui.pb_next.show()
 
     @Slot()
-    def blacklisting(self):
-        """Реализация кнопки 'никогда не тренировать слово'."""
-
-        pass
+    def return_to_menu(self):
+        """Возвращение в главное меню"""
+        global main_window
+        clear_globals()
+        main_window = MainWindow()
+        main_window.show()
+        self.close()
 
     @Slot()
     def make_wrong(self):
@@ -824,49 +833,65 @@ class Training(QWidget):
             self.update_stats()
 
     @Slot()
+    def blacklisting(self):
+        """Реализация кнопки 'добавить в чёрный список'."""
+
+        # Создаём чёрный список, если его ещё нет
+        if not os.path.isfile("blacklist.txt"):
+            with open("blacklist.txt", "w") as f:
+                pass
+
+        with open("blacklist.txt", "r") as file:
+            content = file.read()
+
+        with open("blacklist.txt", "a") as file:
+            if self.current_word not in content:
+                file.write(str(self.current_word) + "\n")
+
+    @Slot()
     def show_results(self):
         """Демонстрация окна с результатами."""
         self.results = Results(self.completed_words)
         self.results.show()
         self.close()
 
-    def smart_add(self):
-        """Работа с умным предложением слов."""
-
-        if not os.path.isfile("hard_words.txt"):
-            with open("hard_words.txt", "w") as file:
-                pass
-
-        # СОХРАНЯЕМ ТЕКУЩЕЕ СОДЕРЖАНИЕ ФАЙЛА
-        with open("hard_words.txt") as file:
-            file_backup = file.readlines()
-            print(file_backup)
-
-        # ПРОВЕРЯЕМ НАЛИЧИЕ СЛОВА В ФАЙЛЕ
-        target = self.a_word
-        print("Target", target)
-        line = 1
-        while line <= len(file_backup):
-            print("Line:", line)
-
-            # Оформляем текущее слово в файле для обработки
-            destination = ""
-            raw_destination = file_backup[line-1]
-            for letter in raw_destination:
-                if letter == ":":
-                    print("Destination:", destination)
-                    break
-                else:
-                    destination += letter
-
-            if target == destination:
-                print("Слово уже есть в файле!")
-                break
-            else:
-                line += 1
-        else:
-            with open("hard_words.txt", "a") as file:
-                file.write(self.a_word + ": 1\n")
+    # def smart_add(self):
+    #     """Работа с умным предложением слов."""
+    #
+    #     if not os.path.isfile("hard_words.txt"):
+    #         with open("hard_words.txt", "w") as file:
+    #             pass
+    #
+    #     # СОХРАНЯЕМ ТЕКУЩЕЕ СОДЕРЖАНИЕ ФАЙЛА
+    #     with open("hard_words.txt") as file:
+    #         file_backup = file.readlines()
+    #         print(file_backup)
+    #
+    #     # ПРОВЕРЯЕМ НАЛИЧИЕ СЛОВА В ФАЙЛЕ
+    #     target = self.a_word
+    #     print("Target", target)
+    #     line = 1
+    #     while line <= len(file_backup):
+    #         print("Line:", line)
+    #
+    #         # Оформляем текущее слово в файле для обработки
+    #         destination = ""
+    #         raw_destination = file_backup[line-1]
+    #         for letter in raw_destination:
+    #             if letter == ":":
+    #                 print("Destination:", destination)
+    #                 break
+    #             else:
+    #                 destination += letter
+    #
+    #         if target == destination:
+    #             print("Слово уже есть в файле!")
+    #             break
+    #         else:
+    #             line += 1
+    #     else:
+    #         with open("hard_words.txt", "a") as file:
+    #             file.write(self.a_word + ": 1\n")
 
     def define_word(self, line):
         """Ищет слово в words.txt, которое нужно загадать, на основе переданного числа (line)."""
@@ -1076,6 +1101,19 @@ class LetterButton(QPushButton):
         self.isAnswer = False
 
 
+def is_id_in_blacklist(target):
+    try:
+        with open("blacklist.txt", "r") as file:
+            content = file.readlines()
+            for line in content:
+                if target.rstrip() == line:
+                    return True
+            else:
+                return False
+    except FileNotFoundError:
+        print("Файла 'blacklist.txt' не существует.")
+
+
 def find_answers(calling_window):
     """Вызывается при всяком запуске тренажёра и нажатии кнопки "Начать".
 Просматривает файл words.txt и на основе заглавных букв в словах составляет
@@ -1175,8 +1213,8 @@ def extract_settings():
                 is_mix_words = bool(int(param.lstrip("is_mix_words=")))
             elif "is_smart_offer=" in param:
                 is_smart_offer = bool(int(param.lstrip("is_smart_offer=")))
-            elif "triggering_threshold=" in param:
-                triggering_threshold = int(param.lstrip("triggering_threshold="))
+            # elif "triggering_threshold=" in param:
+            #     triggering_threshold = int(param.lstrip("triggering_threshold="))
 
 
 def clear_globals():

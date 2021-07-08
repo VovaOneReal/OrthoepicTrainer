@@ -115,14 +115,14 @@ class Ui_Training(object):
         icon2.addFile(u"../materials/icons/end_training.png", QSize(), QIcon.Normal, QIcon.Off)
         self.pb_end_training.setIcon(icon2)
         self.pb_end_training.setIconSize(QSize(16, 16))
-        self.pb_delete_word = QPushButton(Training)
-        self.pb_delete_word.setObjectName(u"pb_delete_word")
-        self.pb_delete_word.setGeometry(QRect(450, 90, 31, 31))
-        self.pb_delete_word.setToolTipDuration(-1)
+        self.pb_blacklisting = QPushButton(Training)
+        self.pb_blacklisting.setObjectName(u"pb_blacklisting")
+        self.pb_blacklisting.setGeometry(QRect(450, 90, 31, 31))
+        self.pb_blacklisting.setToolTipDuration(-1)
         icon3 = QIcon()
         icon3.addFile(u"../materials/icons/delete_word.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.pb_delete_word.setIcon(icon3)
-        self.pb_delete_word.setIconSize(QSize(16, 16))
+        self.pb_blacklisting.setIcon(icon3)
+        self.pb_blacklisting.setIconSize(QSize(16, 16))
 
         self.retranslateUi(Training)
 
@@ -149,8 +149,8 @@ class Ui_Training(object):
 #endif // QT_CONFIG(tooltip)
         self.pb_end_training.setText("")
 #if QT_CONFIG(tooltip)
-        self.pb_delete_word.setToolTip(QCoreApplication.translate("Training", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u043b\u043e\u0432\u043e \u0432 \u0441\u043f\u0438\u0441\u043e\u043a \u043d\u0435\u0442\u0440\u0435\u043d\u0435\u0440\u0443\u0435\u043c\u044b\u0445", None))
+        self.pb_blacklisting.setToolTip(QCoreApplication.translate("Training", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u043b\u043e\u0432\u043e \u0432 \u0447\u0451\u0440\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a", None))
 #endif // QT_CONFIG(tooltip)
-        self.pb_delete_word.setText("")
+        self.pb_blacklisting.setText("")
     # retranslateUi
 

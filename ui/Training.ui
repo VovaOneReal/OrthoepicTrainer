@@ -421,7 +421,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QPushButton" name="pb_delete_word">
+  <widget class="QPushButton" name="pb_blacklisting">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -431,7 +431,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>Добавить слово в список нетренеруемых</string>
+    <string>Добавить слово в чёрный список</string>
    </property>
    <property name="toolTipDuration">
     <number>-1</number>
